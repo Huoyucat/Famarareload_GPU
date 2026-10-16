@@ -1,0 +1,24 @@
+# 1.20–1.21.3 的 CE 配置：由 CE 分配整数 CMD，开镜状态保存在 Famara PDC。
+# 使用普通手持模型，不使用新版 select/empty 或贴近视点的透明叠层。
+items:
+  famara:camera:
+    material: stick
+    data:
+      custom_name: "<!i><white>相机"
+    model:
+      type: minecraft:model
+      path: famara:item/famara_close
+  famara:film_box:
+    material: paper
+    data:
+      custom_name: "<!i><white>胶卷盒"
+    model:
+      type: minecraft:model
+      path: famara:item/film_box
+  famara:photo:
+    material: filled_map
+    data:
+      custom_name: "<!i><white>照片"
+    model:
+      type: minecraft:model
+      path: famara:item/photo

@@ -1,0 +1,4972 @@
+version: 8
+# 从本地 Minecraft 26.3 客户端资源生成，来源及覆盖见 vanilla-colors-report.json。
+# 单个 RGB 为贴图代表色；动态环境/特殊模型未可靠解析时仍用实际 BlockData 地图色。
+# 手动覆盖写入 color-overrides.yml，合法纯黑同样有效。
+ACACIA_BUTTON:
+  r: 166
+  g: 89
+  b: 49
+ACACIA_DOOR:
+  r: 165
+  g: 93
+  b: 58
+ACACIA_FENCE:
+  r: 166
+  g: 89
+  b: 49
+ACACIA_FENCE_GATE:
+  r: 166
+  g: 89
+  b: 49
+ACACIA_HANGING_SIGN:
+  r: 155
+  g: 86
+  b: 62
+ACACIA_LEAVES:
+  r: 42
+  g: 105
+  b: 13
+ACACIA_LOG:
+  r: 119
+  g: 93
+  b: 76
+ACACIA_PLANKS:
+  r: 168
+  g: 90
+  b: 50
+ACACIA_PRESSURE_PLATE:
+  r: 166
+  g: 89
+  b: 49
+ACACIA_SAPLING:
+  r: 118
+  g: 117
+  b: 23
+ACACIA_SHELF:
+  r: 152
+  g: 84
+  b: 52
+ACACIA_SIGN:
+  r: 157
+  g: 89
+  b: 54
+ACACIA_SLAB:
+  r: 168
+  g: 90
+  b: 50
+ACACIA_STAIRS:
+  r: 168
+  g: 90
+  b: 50
+ACACIA_TRAPDOOR:
+  r: 155
+  g: 85
+  b: 49
+ACACIA_WALL_HANGING_SIGN:
+  r: 154
+  g: 86
+  b: 61
+ACACIA_WALL_SIGN:
+  r: 165
+  g: 88
+  b: 49
+ACACIA_WOOD:
+  r: 103
+  g: 96
+  b: 86
+ACTIVATOR_RAIL:
+  r: 129
+  g: 87
+  b: 74
+ALLIUM:
+  r: 158
+  g: 137
+  b: 183
+AMETHYST_BLOCK:
+  r: 133
+  g: 97
+  b: 191
+AMETHYST_CLUSTER:
+  r: 163
+  g: 126
+  b: 207
+ANCIENT_DEBRIS:
+  r: 95
+  g: 64
+  b: 56
+ANDESITE:
+  r: 136
+  g: 136
+  b: 136
+ANDESITE_SLAB:
+  r: 136
+  g: 136
+  b: 136
+ANDESITE_STAIRS:
+  r: 136
+  g: 136
+  b: 136
+ANDESITE_WALL:
+  r: 136
+  g: 136
+  b: 136
+ANVIL:
+  r: 70
+  g: 70
+  b: 70
+AZALEA:
+  r: 94
+  g: 116
+  b: 45
+AZALEA_LEAVES:
+  r: 90
+  g: 114
+  b: 44
+AZURE_BLUET:
+  r: 169
+  g: 204
+  b: 127
+BAMBOO:
+  r: 83
+  g: 129
+  b: 24
+BAMBOO_BLOCK:
+  r: 131
+  g: 143
+  b: 59
+BAMBOO_BUTTON:
+  r: 187
+  g: 167
+  b: 76
+BAMBOO_DOOR:
+  r: 196
+  g: 175
+  b: 83
+BAMBOO_FENCE:
+  r: 207
+  g: 187
+  b: 89
+BAMBOO_FENCE_GATE:
+  r: 208
+  g: 187
+  b: 88
+BAMBOO_HANGING_SIGN:
+  r: 184
+  g: 168
+  b: 86
+BAMBOO_MOSAIC:
+  r: 190
+  g: 170
+  b: 78
+BAMBOO_MOSAIC_SLAB:
+  r: 190
+  g: 170
+  b: 78
+BAMBOO_MOSAIC_STAIRS:
+  r: 190
+  g: 170
+  b: 78
+BAMBOO_PLANKS:
+  r: 193
+  g: 173
+  b: 80
+BAMBOO_PRESSURE_PLATE:
+  r: 192
+  g: 171
+  b: 80
+BAMBOO_SAPLING:
+  r: 92
+  g: 89
+  b: 35
+BAMBOO_SHELF:
+  r: 179
+  g: 161
+  b: 74
+BAMBOO_SIGN:
+  r: 208
+  g: 187
+  b: 88
+BAMBOO_SLAB:
+  r: 193
+  g: 173
+  b: 80
+BAMBOO_STAIRS:
+  r: 193
+  g: 173
+  b: 80
+BAMBOO_TRAPDOOR:
+  r: 197
+  g: 178
+  b: 85
+BAMBOO_WALL_HANGING_SIGN:
+  r: 179
+  g: 163
+  b: 84
+BAMBOO_WALL_SIGN:
+  r: 207
+  g: 186
+  b: 87
+BARREL:
+  r: 110
+  g: 82
+  b: 49
+BARRIER:
+  r: 212
+  g: 0
+  b: 0
+BASALT:
+  r: 75
+  g: 75
+  b: 80
+BEACON:
+  r: 102
+  g: 159
+  b: 162
+BEDROCK:
+  r: 85
+  g: 85
+  b: 85
+BEEHIVE:
+  r: 165
+  g: 133
+  b: 80
+BEETROOTS:
+  r: 73
+  g: 124
+  b: 38
+BEE_NEST:
+  r: 189
+  g: 147
+  b: 78
+BELL:
+  r: 75
+  g: 57
+  b: 40
+BIG_DRIPLEAF:
+  r: 104
+  g: 132
+  b: 49
+BIG_DRIPLEAF_STEM:
+  r: 91
+  g: 115
+  b: 45
+BIRCH_BUTTON:
+  r: 191
+  g: 174
+  b: 121
+BIRCH_DOOR:
+  r: 210
+  g: 197
+  b: 153
+BIRCH_FENCE:
+  r: 191
+  g: 173
+  b: 120
+BIRCH_FENCE_GATE:
+  r: 191
+  g: 173
+  b: 120
+BIRCH_HANGING_SIGN:
+  r: 175
+  g: 158
+  b: 111
+BIRCH_LEAVES:
+  r: 65
+  g: 84
+  b: 43
+BIRCH_LOG:
+  r: 208
+  g: 203
+  b: 185
+BIRCH_PLANKS:
+  r: 192
+  g: 175
+  b: 121
+BIRCH_PRESSURE_PLATE:
+  r: 190
+  g: 173
+  b: 119
+BIRCH_SAPLING:
+  r: 127
+  g: 160
+  b: 79
+BIRCH_SHELF:
+  r: 169
+  g: 150
+  b: 102
+BIRCH_SIGN:
+  r: 194
+  g: 179
+  b: 132
+BIRCH_SLAB:
+  r: 192
+  g: 175
+  b: 121
+BIRCH_STAIRS:
+  r: 192
+  g: 175
+  b: 121
+BIRCH_TRAPDOOR:
+  r: 199
+  g: 185
+  b: 144
+BIRCH_WALL_HANGING_SIGN:
+  r: 175
+  g: 157
+  b: 110
+BIRCH_WALL_SIGN:
+  r: 190
+  g: 173
+  b: 119
+BIRCH_WOOD:
+  r: 216
+  g: 215
+  b: 210
+BLACKSTONE:
+  r: 42
+  g: 35
+  b: 41
+BLACKSTONE_SLAB:
+  r: 42
+  g: 35
+  b: 41
+BLACKSTONE_STAIRS:
+  r: 42
+  g: 35
+  b: 41
+BLACKSTONE_WALL:
+  r: 42
+  g: 35
+  b: 40
+BLACK_BED:
+  r: 115
+  g: 101
+  b: 77
+BLACK_CANDLE:
+  r: 51
+  g: 44
+  b: 62
+BLACK_CANDLE_CAKE:
+  r: 187
+  g: 140
+  b: 118
+BLACK_CARPET:
+  r: 20
+  g: 21
+  b: 25
+BLACK_CONCRETE:
+  r: 8
+  g: 10
+  b: 15
+BLACK_CONCRETE_POWDER:
+  r: 25
+  g: 26
+  b: 31
+BLACK_CONCRETE_SLAB:
+  r: 8
+  g: 10
+  b: 15
+BLACK_CONCRETE_STAIRS:
+  r: 8
+  g: 10
+  b: 15
+BLACK_GLAZED_TERRACOTTA:
+  r: 67
+  g: 30
+  b: 32
+BLACK_SHULKER_BOX:
+  r: 42
+  g: 43
+  b: 40
+BLACK_STAINED_GLASS:
+  r: 25
+  g: 25
+  b: 25
+BLACK_STAINED_GLASS_PANE:
+  r: 24
+  g: 24
+  b: 24
+BLACK_TERRACOTTA:
+  r: 37
+  g: 22
+  b: 16
+BLACK_WOOL:
+  r: 20
+  g: 21
+  b: 25
+BLACK_WOOL_SLAB:
+  r: 20
+  g: 21
+  b: 25
+BLACK_WOOL_STAIRS:
+  r: 20
+  g: 21
+  b: 25
+BLAST_FURNACE:
+  r: 99
+  g: 98
+  b: 98
+BLUE_BED:
+  r: 126
+  g: 119
+  b: 124
+BLUE_CANDLE:
+  r: 58
+  g: 78
+  b: 167
+BLUE_CANDLE_CAKE:
+  r: 188
+  g: 142
+  b: 125
+BLUE_CARPET:
+  r: 53
+  g: 57
+  b: 157
+BLUE_CONCRETE:
+  r: 44
+  g: 46
+  b: 143
+BLUE_CONCRETE_POWDER:
+  r: 70
+  g: 73
+  b: 166
+BLUE_CONCRETE_SLAB:
+  r: 44
+  g: 46
+  b: 143
+BLUE_CONCRETE_STAIRS:
+  r: 44
+  g: 46
+  b: 143
+BLUE_GLAZED_TERRACOTTA:
+  r: 47
+  g: 64
+  b: 139
+BLUE_ICE:
+  r: 116
+  g: 167
+  b: 253
+BLUE_ORCHID:
+  r: 47
+  g: 162
+  b: 168
+BLUE_SHULKER_BOX:
+  r: 57
+  g: 59
+  b: 128
+BLUE_STAINED_GLASS:
+  r: 51
+  g: 76
+  b: 178
+BLUE_STAINED_GLASS_PANE:
+  r: 50
+  g: 75
+  b: 175
+BLUE_TERRACOTTA:
+  r: 74
+  g: 59
+  b: 91
+BLUE_WOOL:
+  r: 53
+  g: 57
+  b: 157
+BLUE_WOOL_SLAB:
+  r: 53
+  g: 57
+  b: 157
+BLUE_WOOL_STAIRS:
+  r: 53
+  g: 57
+  b: 157
+BONE_BLOCK:
+  r: 222
+  g: 219
+  b: 198
+BOOKSHELF:
+  r: 132
+  g: 106
+  b: 66
+BRAIN_CORAL:
+  r: 197
+  g: 84
+  b: 152
+BRAIN_CORAL_BLOCK:
+  r: 207
+  g: 91
+  b: 159
+BRAIN_CORAL_FAN:
+  r: 202
+  g: 84
+  b: 153
+BRAIN_CORAL_WALL_FAN:
+  r: 202
+  g: 84
+  b: 153
+BREWING_STAND:
+  r: 123
+  g: 103
+  b: 82
+BRICKS:
+  r: 150
+  g: 97
+  b: 83
+BRICK_SLAB:
+  r: 150
+  g: 97
+  b: 83
+BRICK_STAIRS:
+  r: 150
+  g: 97
+  b: 83
+BRICK_WALL:
+  r: 150
+  g: 97
+  b: 82
+BROWN_BED:
+  r: 148
+  g: 118
+  b: 82
+BROWN_CANDLE:
+  r: 127
+  g: 81
+  b: 46
+BROWN_CANDLE_CAKE:
+  r: 192
+  g: 143
+  b: 117
+BROWN_CARPET:
+  r: 114
+  g: 71
+  b: 40
+BROWN_CONCRETE:
+  r: 96
+  g: 59
+  b: 31
+BROWN_CONCRETE_POWDER:
+  r: 125
+  g: 84
+  b: 53
+BROWN_CONCRETE_SLAB:
+  r: 96
+  g: 59
+  b: 31
+BROWN_CONCRETE_STAIRS:
+  r: 96
+  g: 59
+  b: 31
+BROWN_GLAZED_TERRACOTTA:
+  r: 119
+  g: 106
+  b: 85
+BROWN_MUSHROOM:
+  r: 153
+  g: 116
+  b: 92
+BROWN_MUSHROOM_BLOCK:
+  r: 175
+  g: 140
+  b: 100
+BROWN_SHULKER_BOX:
+  r: 109
+  g: 77
+  b: 45
+BROWN_STAINED_GLASS:
+  r: 102
+  g: 76
+  b: 51
+BROWN_STAINED_GLASS_PANE:
+  r: 100
+  g: 75
+  b: 50
+BROWN_TERRACOTTA:
+  r: 77
+  g: 51
+  b: 35
+BROWN_WOOL:
+  r: 114
+  g: 71
+  b: 40
+BROWN_WOOL_SLAB:
+  r: 114
+  g: 71
+  b: 40
+BROWN_WOOL_STAIRS:
+  r: 114
+  g: 71
+  b: 40
+BUBBLE_COLUMN:
+  r: 43
+  g: 81
+  b: 158
+BUBBLE_CORAL:
+  r: 161
+  g: 23
+  b: 159
+BUBBLE_CORAL_BLOCK:
+  r: 165
+  g: 26
+  b: 162
+BUBBLE_CORAL_FAN:
+  r: 160
+  g: 32
+  b: 159
+BUBBLE_CORAL_WALL_FAN:
+  r: 160
+  g: 32
+  b: 159
+BUDDING_AMETHYST:
+  r: 132
+  g: 96
+  b: 186
+BUSH:
+  r: 58
+  g: 89
+  b: 50
+CACTUS:
+  r: 96
+  g: 135
+  b: 51
+CACTUS_FLOWER:
+  r: 209
+  g: 120
+  b: 135
+CAKE:
+  r: 184
+  g: 135
+  b: 110
+CALCITE:
+  r: 223
+  g: 224
+  b: 220
+CALIBRATED_SCULK_SENSOR:
+  r: 49
+  g: 77
+  b: 98
+CAMPFIRE:
+  r: 128
+  g: 101
+  b: 59
+CANDLE:
+  r: 231
+  g: 206
+  b: 163
+CANDLE_CAKE:
+  r: 199
+  g: 151
+  b: 125
+CARROTS:
+  r: 55
+  g: 115
+  b: 38
+CARTOGRAPHY_TABLE:
+  r: 76
+  g: 55
+  b: 34
+CARVED_PUMPKIN:
+  r: 188
+  g: 111
+  b: 23
+CAULDRON:
+  r: 69
+  g: 68
+  b: 70
+CAVE_VINES:
+  r: 97
+  g: 111
+  b: 41
+CAVE_VINES_PLANT:
+  r: 96
+  g: 104
+  b: 39
+CHAIN_COMMAND_BLOCK:
+  r: 130
+  g: 161
+  b: 147
+CHERRY_BUTTON:
+  r: 226
+  g: 177
+  b: 171
+CHERRY_DOOR:
+  r: 225
+  g: 176
+  b: 170
+CHERRY_FENCE:
+  r: 225
+  g: 176
+  b: 170
+CHERRY_FENCE_GATE:
+  r: 226
+  g: 177
+  b: 171
+CHERRY_HANGING_SIGN:
+  r: 189
+  g: 130
+  b: 135
+CHERRY_LEAVES:
+  r: 229
+  g: 172
+  b: 194
+CHERRY_LOG:
+  r: 98
+  g: 69
+  b: 75
+CHERRY_PLANKS:
+  r: 226
+  g: 178
+  b: 172
+CHERRY_PRESSURE_PLATE:
+  r: 226
+  g: 177
+  b: 171
+CHERRY_SAPLING:
+  r: 164
+  g: 117
+  b: 143
+CHERRY_SHELF:
+  r: 198
+  g: 125
+  b: 123
+CHERRY_SIGN:
+  r: 203
+  g: 158
+  b: 154
+CHERRY_SLAB:
+  r: 226
+  g: 178
+  b: 172
+CHERRY_STAIRS:
+  r: 226
+  g: 178
+  b: 172
+CHERRY_TRAPDOOR:
+  r: 227
+  g: 181
+  b: 175
+CHERRY_WALL_HANGING_SIGN:
+  r: 189
+  g: 129
+  b: 135
+CHERRY_WALL_SIGN:
+  r: 226
+  g: 177
+  b: 171
+CHERRY_WOOD:
+  r: 54
+  g: 33
+  b: 44
+CHEST:
+  r: 105
+  g: 77
+  b: 34
+CHIPPED_ANVIL:
+  r: 70
+  g: 70
+  b: 70
+CHISELED_BOOKSHELF:
+  r: 110
+  g: 86
+  b: 58
+CHISELED_CINNABAR:
+  r: 146
+  g: 55
+  b: 54
+CHISELED_COPPER:
+  r: 184
+  g: 100
+  b: 73
+CHISELED_DEEPSLATE:
+  r: 54
+  g: 54
+  b: 54
+CHISELED_NETHER_BRICKS:
+  r: 45
+  g: 22
+  b: 27
+CHISELED_POLISHED_BLACKSTONE:
+  r: 53
+  g: 48
+  b: 56
+CHISELED_QUARTZ_BLOCK:
+  r: 231
+  g: 226
+  b: 217
+CHISELED_RED_SANDSTONE:
+  r: 182
+  g: 97
+  b: 28
+CHISELED_RESIN_BRICKS:
+  r: 200
+  g: 84
+  b: 24
+CHISELED_SANDSTONE:
+  r: 218
+  g: 206
+  b: 160
+CHISELED_STONE_BRICKS:
+  r: 119
+  g: 118
+  b: 119
+CHISELED_SULFUR:
+  r: 187
+  g: 169
+  b: 91
+CHISELED_TUFF:
+  r: 90
+  g: 95
+  b: 88
+CHISELED_TUFF_BRICKS:
+  r: 102
+  g: 106
+  b: 99
+CHORUS_FLOWER:
+  r: 120
+  g: 86
+  b: 120
+CHORUS_PLANT:
+  r: 93
+  g: 56
+  b: 93
+CINNABAR:
+  r: 151
+  g: 82
+  b: 78
+CINNABAR_BRICKS:
+  r: 148
+  g: 55
+  b: 53
+CINNABAR_BRICK_SLAB:
+  r: 148
+  g: 55
+  b: 53
+CINNABAR_BRICK_STAIRS:
+  r: 148
+  g: 55
+  b: 53
+CINNABAR_BRICK_WALL:
+  r: 147
+  g: 54
+  b: 52
+CINNABAR_SLAB:
+  r: 151
+  g: 82
+  b: 78
+CINNABAR_STAIRS:
+  r: 151
+  g: 82
+  b: 78
+CINNABAR_WALL:
+  r: 153
+  g: 83
+  b: 78
+CLAY:
+  r: 160
+  g: 166
+  b: 179
+CLOSED_EYEBLOSSOM:
+  r: 108
+  g: 98
+  b: 101
+COAL_BLOCK:
+  r: 16
+  g: 15
+  b: 15
+COAL_ORE:
+  r: 105
+  g: 105
+  b: 105
+COARSE_DIRT:
+  r: 119
+  g: 85
+  b: 59
+COBBLED_DEEPSLATE:
+  r: 77
+  g: 77
+  b: 80
+COBBLED_DEEPSLATE_SLAB:
+  r: 77
+  g: 77
+  b: 80
+COBBLED_DEEPSLATE_STAIRS:
+  r: 77
+  g: 77
+  b: 80
+COBBLED_DEEPSLATE_WALL:
+  r: 77
+  g: 77
+  b: 80
+COBBLESTONE:
+  r: 127
+  g: 127
+  b: 127
+COBBLESTONE_SLAB:
+  r: 127
+  g: 127
+  b: 127
+COBBLESTONE_STAIRS:
+  r: 127
+  g: 127
+  b: 127
+COBBLESTONE_WALL:
+  r: 127
+  g: 126
+  b: 126
+COBWEB:
+  r: 228
+  g: 233
+  b: 234
+COCOA:
+  r: 144
+  g: 111
+  b: 52
+COMMAND_BLOCK:
+  r: 177
+  g: 133
+  b: 107
+COMPARATOR:
+  r: 167
+  g: 130
+  b: 128
+COMPOSTER:
+  r: 96
+  g: 66
+  b: 28
+CONDUIT:
+  r: 159
+  g: 139
+  b: 113
+COPPER_BARS:
+  r: 152
+  g: 78
+  b: 52
+COPPER_BLOCK:
+  r: 192
+  g: 107
+  b: 79
+COPPER_BULB:
+  r: 186
+  g: 118
+  b: 81
+COPPER_CHAIN:
+  r: 151
+  g: 79
+  b: 54
+COPPER_CHEST:
+  r: 167
+  g: 92
+  b: 68
+COPPER_DOOR:
+  r: 187
+  g: 106
+  b: 80
+COPPER_GOLEM_STATUE:
+  r: 192
+  g: 107
+  b: 79
+COPPER_GRATE:
+  r: 191
+  g: 107
+  b: 79
+COPPER_LANTERN:
+  r: 159
+  g: 116
+  b: 81
+COPPER_ORE:
+  r: 124
+  g: 125
+  b: 120
+COPPER_TORCH:
+  r: 117
+  g: 112
+  b: 75
+COPPER_TRAPDOOR:
+  r: 187
+  g: 104
+  b: 77
+COPPER_WALL_TORCH:
+  r: 117
+  g: 112
+  b: 75
+CORNFLOWER:
+  r: 79
+  g: 121
+  b: 146
+CRACKED_DEEPSLATE_BRICKS:
+  r: 64
+  g: 64
+  b: 65
+CRACKED_DEEPSLATE_TILES:
+  r: 52
+  g: 52
+  b: 52
+CRACKED_NETHER_BRICKS:
+  r: 40
+  g: 20
+  b: 23
+CRACKED_POLISHED_BLACKSTONE_BRICKS:
+  r: 44
+  g: 37
+  b: 43
+CRACKED_STONE_BRICKS:
+  r: 118
+  g: 117
+  b: 118
+CRAFTER:
+  r: 116
+  g: 103
+  b: 92
+CRAFTING_TABLE:
+  r: 132
+  g: 103
+  b: 64
+CREAKING_HEART:
+  r: 110
+  g: 71
+  b: 51
+CREEPER_HEAD:
+  r: 86
+  g: 147
+  b: 79
+CREEPER_WALL_HEAD:
+  r: 86
+  g: 147
+  b: 79
+CRIMSON_BUTTON:
+  r: 99
+  g: 47
+  b: 69
+CRIMSON_DOOR:
+  r: 117
+  g: 56
+  b: 80
+CRIMSON_FENCE:
+  r: 99
+  g: 48
+  b: 69
+CRIMSON_FENCE_GATE:
+  r: 99
+  g: 48
+  b: 69
+CRIMSON_FUNGUS:
+  r: 141
+  g: 44
+  b: 29
+CRIMSON_HANGING_SIGN:
+  r: 122
+  g: 56
+  b: 86
+CRIMSON_HYPHAE:
+  r: 92
+  g: 25
+  b: 29
+CRIMSON_NYLIUM:
+  r: 109
+  g: 29
+  b: 29
+CRIMSON_PLANKS:
+  r: 101
+  g: 48
+  b: 70
+CRIMSON_PRESSURE_PLATE:
+  r: 98
+  g: 47
+  b: 69
+CRIMSON_ROOTS:
+  r: 126
+  g: 8
+  b: 41
+CRIMSON_SHELF:
+  r: 125
+  g: 50
+  b: 80
+CRIMSON_SIGN:
+  r: 101
+  g: 46
+  b: 66
+CRIMSON_SLAB:
+  r: 101
+  g: 48
+  b: 70
+CRIMSON_STAIRS:
+  r: 100
+  g: 48
+  b: 70
+CRIMSON_STEM:
+  r: 99
+  g: 33
+  b: 43
+CRIMSON_TRAPDOOR:
+  r: 103
+  g: 50
+  b: 72
+CRIMSON_WALL_HANGING_SIGN:
+  r: 122
+  g: 56
+  b: 86
+CRIMSON_WALL_SIGN:
+  r: 102
+  g: 49
+  b: 71
+CRYING_OBSIDIAN:
+  r: 32
+  g: 10
+  b: 60
+CUT_COPPER:
+  r: 191
+  g: 106
+  b: 80
+CUT_COPPER_SLAB:
+  r: 191
+  g: 106
+  b: 80
+CUT_COPPER_STAIRS:
+  r: 191
+  g: 106
+  b: 80
+CUT_RED_SANDSTONE:
+  r: 186
+  g: 100
+  b: 31
+CUT_RED_SANDSTONE_SLAB:
+  r: 185
+  g: 100
+  b: 31
+CUT_SANDSTONE:
+  r: 219
+  g: 209
+  b: 163
+CUT_SANDSTONE_SLAB:
+  r: 220
+  g: 209
+  b: 164
+CYAN_BED:
+  r: 112
+  g: 137
+  b: 112
+CYAN_CANDLE:
+  r: 24
+  g: 136
+  b: 132
+CYAN_CANDLE_CAKE:
+  r: 185
+  g: 146
+  b: 123
+CYAN_CARPET:
+  r: 21
+  g: 137
+  b: 145
+CYAN_CONCRETE:
+  r: 21
+  g: 119
+  b: 136
+CYAN_CONCRETE_POWDER:
+  r: 36
+  g: 147
+  b: 157
+CYAN_CONCRETE_SLAB:
+  r: 21
+  g: 119
+  b: 136
+CYAN_CONCRETE_STAIRS:
+  r: 21
+  g: 119
+  b: 136
+CYAN_GLAZED_TERRACOTTA:
+  r: 52
+  g: 118
+  b: 125
+CYAN_SHULKER_BOX:
+  r: 40
+  g: 119
+  b: 124
+CYAN_STAINED_GLASS:
+  r: 76
+  g: 127
+  b: 153
+CYAN_STAINED_GLASS_PANE:
+  r: 75
+  g: 125
+  b: 150
+CYAN_TERRACOTTA:
+  r: 86
+  g: 91
+  b: 91
+CYAN_WOOL:
+  r: 21
+  g: 137
+  b: 145
+CYAN_WOOL_SLAB:
+  r: 21
+  g: 137
+  b: 145
+CYAN_WOOL_STAIRS:
+  r: 21
+  g: 137
+  b: 145
+DAMAGED_ANVIL:
+  r: 70
+  g: 70
+  b: 70
+DANDELION:
+  r: 147
+  g: 172
+  b: 43
+DARK_OAK_BUTTON:
+  r: 66
+  g: 42
+  b: 20
+DARK_OAK_DOOR:
+  r: 74
+  g: 50
+  b: 25
+DARK_OAK_FENCE:
+  r: 65
+  g: 42
+  b: 19
+DARK_OAK_FENCE_GATE:
+  r: 65
+  g: 42
+  b: 19
+DARK_OAK_HANGING_SIGN:
+  r: 68
+  g: 56
+  b: 41
+DARK_OAK_LEAVES:
+  r: 42
+  g: 107
+  b: 14
+DARK_OAK_LOG:
+  r: 62
+  g: 46
+  b: 24
+DARK_OAK_PLANKS:
+  r: 66
+  g: 43
+  b: 20
+DARK_OAK_PRESSURE_PLATE:
+  r: 65
+  g: 42
+  b: 19
+DARK_OAK_SAPLING:
+  r: 61
+  g: 90
+  b: 30
+DARK_OAK_SHELF:
+  r: 64
+  g: 49
+  b: 31
+DARK_OAK_SIGN:
+  r: 64
+  g: 42
+  b: 20
+DARK_OAK_SLAB:
+  r: 66
+  g: 43
+  b: 20
+DARK_OAK_STAIRS:
+  r: 66
+  g: 43
+  b: 20
+DARK_OAK_TRAPDOOR:
+  r: 77
+  g: 50
+  b: 24
+DARK_OAK_WALL_HANGING_SIGN:
+  r: 67
+  g: 55
+  b: 41
+DARK_OAK_WALL_SIGN:
+  r: 65
+  g: 41
+  b: 19
+DARK_OAK_WOOD:
+  r: 60
+  g: 46
+  b: 26
+DARK_PRISMARINE:
+  r: 51
+  g: 91
+  b: 75
+DARK_PRISMARINE_SLAB:
+  r: 51
+  g: 91
+  b: 75
+DARK_PRISMARINE_STAIRS:
+  r: 51
+  g: 91
+  b: 75
+DAYLIGHT_DETECTOR:
+  r: 80
+  g: 71
+  b: 54
+DEAD_BRAIN_CORAL:
+  r: 133
+  g: 125
+  b: 120
+DEAD_BRAIN_CORAL_BLOCK:
+  r: 124
+  g: 117
+  b: 114
+DEAD_BRAIN_CORAL_FAN:
+  r: 132
+  g: 125
+  b: 121
+DEAD_BRAIN_CORAL_WALL_FAN:
+  r: 132
+  g: 125
+  b: 121
+DEAD_BUBBLE_CORAL:
+  r: 132
+  g: 124
+  b: 120
+DEAD_BUBBLE_CORAL_BLOCK:
+  r: 131
+  g: 123
+  b: 119
+DEAD_BUBBLE_CORAL_FAN:
+  r: 140
+  g: 134
+  b: 130
+DEAD_BUBBLE_CORAL_WALL_FAN:
+  r: 140
+  g: 134
+  b: 130
+DEAD_BUSH:
+  r: 107
+  g: 78
+  b: 40
+DEAD_FIRE_CORAL:
+  r: 136
+  g: 128
+  b: 124
+DEAD_FIRE_CORAL_BLOCK:
+  r: 131
+  g: 123
+  b: 119
+DEAD_FIRE_CORAL_FAN:
+  r: 124
+  g: 118
+  b: 114
+DEAD_FIRE_CORAL_WALL_FAN:
+  r: 124
+  g: 118
+  b: 114
+DEAD_HORN_CORAL:
+  r: 142
+  g: 135
+  b: 129
+DEAD_HORN_CORAL_BLOCK:
+  r: 133
+  g: 126
+  b: 122
+DEAD_HORN_CORAL_FAN:
+  r: 134
+  g: 125
+  b: 121
+DEAD_HORN_CORAL_WALL_FAN:
+  r: 134
+  g: 125
+  b: 121
+DEAD_TUBE_CORAL:
+  r: 118
+  g: 111
+  b: 107
+DEAD_TUBE_CORAL_BLOCK:
+  r: 130
+  g: 123
+  b: 119
+DEAD_TUBE_CORAL_FAN:
+  r: 128
+  g: 122
+  b: 118
+DEAD_TUBE_CORAL_WALL_FAN:
+  r: 128
+  g: 122
+  b: 118
+DECORATED_POT:
+  r: 152
+  g: 94
+  b: 67
+DEEPSLATE:
+  r: 82
+  g: 82
+  b: 84
+DEEPSLATE_BRICKS:
+  r: 70
+  g: 70
+  b: 71
+DEEPSLATE_BRICK_SLAB:
+  r: 70
+  g: 70
+  b: 71
+DEEPSLATE_BRICK_STAIRS:
+  r: 71
+  g: 70
+  b: 71
+DEEPSLATE_BRICK_WALL:
+  r: 69
+  g: 69
+  b: 70
+DEEPSLATE_COAL_ORE:
+  r: 74
+  g: 74
+  b: 76
+DEEPSLATE_COPPER_ORE:
+  r: 92
+  g: 93
+  b: 89
+DEEPSLATE_DIAMOND_ORE:
+  r: 83
+  g: 106
+  b: 106
+DEEPSLATE_EMERALD_ORE:
+  r: 78
+  g: 104
+  b: 87
+DEEPSLATE_GOLD_ORE:
+  r: 115
+  g: 102
+  b: 78
+DEEPSLATE_IRON_ORE:
+  r: 106
+  g: 99
+  b: 94
+DEEPSLATE_LAPIS_ORE:
+  r: 79
+  g: 90
+  b: 115
+DEEPSLATE_REDSTONE_ORE:
+  r: 104
+  g: 73
+  b: 74
+DEEPSLATE_TILES:
+  r: 54
+  g: 54
+  b: 55
+DEEPSLATE_TILE_SLAB:
+  r: 54
+  g: 54
+  b: 55
+DEEPSLATE_TILE_STAIRS:
+  r: 54
+  g: 54
+  b: 54
+DEEPSLATE_TILE_WALL:
+  r: 58
+  g: 57
+  b: 58
+DETECTOR_RAIL:
+  r: 130
+  g: 104
+  b: 89
+DIAMOND_BLOCK:
+  r: 98
+  g: 237
+  b: 228
+DIAMOND_ORE:
+  r: 121
+  g: 141
+  b: 140
+DIORITE:
+  r: 188
+  g: 188
+  b: 188
+DIORITE_SLAB:
+  r: 188
+  g: 188
+  b: 188
+DIORITE_STAIRS:
+  r: 188
+  g: 188
+  b: 189
+DIORITE_WALL:
+  r: 188
+  g: 188
+  b: 188
+DIRT:
+  r: 134
+  g: 96
+  b: 67
+DIRT_PATH:
+  r: 138
+  g: 103
+  b: 66
+DISPENSER:
+  r: 114
+  g: 113
+  b: 113
+DRAGON_EGG:
+  r: 13
+  g: 9
+  b: 16
+DRAGON_HEAD:
+  r: 38
+  g: 37
+  b: 38
+DRAGON_WALL_HEAD:
+  r: 38
+  g: 37
+  b: 38
+DRIED_GHAST:
+  r: 186
+  g: 179
+  b: 179
+DRIED_KELP_BLOCK:
+  r: 42
+  g: 52
+  b: 32
+DRIPSTONE_BLOCK:
+  r: 134
+  g: 107
+  b: 92
+DROPPER:
+  r: 114
+  g: 113
+  b: 113
+EMERALD_BLOCK:
+  r: 42
+  g: 203
+  b: 87
+EMERALD_ORE:
+  r: 108
+  g: 136
+  b: 115
+ENCHANTING_TABLE:
+  r: 58
+  g: 45
+  b: 56
+ENDER_CHEST:
+  r: 25
+  g: 39
+  b: 41
+END_GATEWAY:
+  r: 15
+  g: 10
+  b: 24
+END_PORTAL:
+  r: 15
+  g: 10
+  b: 24
+END_PORTAL_FRAME:
+  r: 145
+  g: 160
+  b: 121
+END_ROD:
+  r: 224
+  g: 215
+  b: 202
+END_STONE:
+  r: 219
+  g: 222
+  b: 158
+END_STONE_BRICKS:
+  r: 218
+  g: 224
+  b: 162
+END_STONE_BRICK_SLAB:
+  r: 218
+  g: 224
+  b: 162
+END_STONE_BRICK_STAIRS:
+  r: 218
+  g: 223
+  b: 162
+END_STONE_BRICK_WALL:
+  r: 219
+  g: 225
+  b: 162
+EXPOSED_CHISELED_COPPER:
+  r: 154
+  g: 119
+  b: 100
+EXPOSED_COPPER:
+  r: 161
+  g: 125
+  b: 103
+EXPOSED_COPPER_BARS:
+  r: 129
+  g: 105
+  b: 87
+EXPOSED_COPPER_BULB:
+  r: 165
+  g: 125
+  b: 94
+EXPOSED_COPPER_CHAIN:
+  r: 126
+  g: 101
+  b: 83
+EXPOSED_COPPER_CHEST:
+  r: 145
+  g: 110
+  b: 94
+EXPOSED_COPPER_DOOR:
+  r: 159
+  g: 120
+  b: 103
+EXPOSED_COPPER_GOLEM_STATUE:
+  r: 161
+  g: 125
+  b: 103
+EXPOSED_COPPER_GRATE:
+  r: 161
+  g: 125
+  b: 104
+EXPOSED_COPPER_LANTERN:
+  r: 151
+  g: 138
+  b: 109
+EXPOSED_COPPER_TRAPDOOR:
+  r: 157
+  g: 123
+  b: 102
+EXPOSED_CUT_COPPER:
+  r: 154
+  g: 121
+  b: 101
+EXPOSED_CUT_COPPER_SLAB:
+  r: 154
+  g: 121
+  b: 101
+EXPOSED_CUT_COPPER_STAIRS:
+  r: 154
+  g: 121
+  b: 101
+EXPOSED_LIGHTNING_ROD:
+  r: 208
+  g: 188
+  b: 180
+FARMLAND:
+  r: 134
+  g: 95
+  b: 66
+FERN:
+  r: 60
+  g: 92
+  b: 52
+FIRE:
+  r: 211
+  g: 139
+  b: 51
+FIREFLY_BUSH:
+  r: 89
+  g: 85
+  b: 45
+FIRE_CORAL:
+  r: 166
+  g: 37
+  b: 46
+FIRE_CORAL_BLOCK:
+  r: 163
+  g: 35
+  b: 46
+FIRE_CORAL_FAN:
+  r: 158
+  g: 34
+  b: 45
+FIRE_CORAL_WALL_FAN:
+  r: 158
+  g: 34
+  b: 45
+FLETCHING_TABLE:
+  r: 186
+  g: 166
+  b: 122
+FLOWERING_AZALEA:
+  r: 105
+  g: 114
+  b: 62
+FLOWERING_AZALEA_LEAVES:
+  r: 99
+  g: 111
+  b: 60
+FLOWER_POT:
+  r: 123
+  g: 69
+  b: 53
+FROGSPAWN:
+  r: 110
+  g: 95
+  b: 86
+FROSTED_ICE:
+  r: 138
+  g: 179
+  b: 252
+FURNACE:
+  r: 114
+  g: 113
+  b: 112
+GILDED_BLACKSTONE:
+  r: 55
+  g: 42
+  b: 38
+GLASS:
+  r: 175
+  g: 213
+  b: 219
+GLASS_PANE:
+  r: 172
+  g: 212
+  b: 218
+GLOWSTONE:
+  r: 171
+  g: 131
+  b: 84
+GLOW_LICHEN:
+  r: 112
+  g: 130
+  b: 121
+GOLDEN_DANDELION:
+  r: 159
+  g: 102
+  b: 37
+GOLD_BLOCK:
+  r: 246
+  g: 208
+  b: 61
+GOLD_ORE:
+  r: 145
+  g: 133
+  b: 106
+GRANITE:
+  r: 149
+  g: 103
+  b: 85
+GRANITE_SLAB:
+  r: 149
+  g: 103
+  b: 85
+GRANITE_STAIRS:
+  r: 149
+  g: 103
+  b: 86
+GRANITE_WALL:
+  r: 147
+  g: 101
+  b: 84
+GRASS_BLOCK:
+  r: 137
+  g: 123
+  b: 94
+GRAVEL:
+  r: 131
+  g: 127
+  b: 126
+GRAY_BED:
+  r: 136
+  g: 126
+  b: 102
+GRAY_CANDLE:
+  r: 94
+  g: 106
+  b: 102
+GRAY_CANDLE_CAKE:
+  r: 190
+  g: 144
+  b: 121
+GRAY_CARPET:
+  r: 62
+  g: 68
+  b: 71
+GRAY_CONCRETE:
+  r: 54
+  g: 57
+  b: 61
+GRAY_CONCRETE_POWDER:
+  r: 76
+  g: 81
+  b: 84
+GRAY_CONCRETE_SLAB:
+  r: 54
+  g: 57
+  b: 61
+GRAY_CONCRETE_STAIRS:
+  r: 54
+  g: 57
+  b: 61
+GRAY_GLAZED_TERRACOTTA:
+  r: 83
+  g: 90
+  b: 93
+GRAY_SHULKER_BOX:
+  r: 67
+  g: 70
+  b: 66
+GRAY_STAINED_GLASS:
+  r: 76
+  g: 76
+  b: 76
+GRAY_STAINED_GLASS_PANE:
+  r: 75
+  g: 75
+  b: 75
+GRAY_TERRACOTTA:
+  r: 57
+  g: 42
+  b: 35
+GRAY_WOOL:
+  r: 62
+  g: 68
+  b: 71
+GRAY_WOOL_SLAB:
+  r: 62
+  g: 68
+  b: 71
+GRAY_WOOL_STAIRS:
+  r: 62
+  g: 68
+  b: 71
+GREEN_BED:
+  r: 133
+  g: 127
+  b: 74
+GREEN_CANDLE:
+  r: 84
+  g: 106
+  b: 22
+GREEN_CANDLE_CAKE:
+  r: 189
+  g: 144
+  b: 115
+GREEN_CARPET:
+  r: 84
+  g: 109
+  b: 27
+GREEN_CONCRETE:
+  r: 73
+  g: 91
+  b: 36
+GREEN_CONCRETE_POWDER:
+  r: 97
+  g: 119
+  b: 44
+GREEN_CONCRETE_SLAB:
+  r: 73
+  g: 91
+  b: 36
+GREEN_CONCRETE_STAIRS:
+  r: 73
+  g: 91
+  b: 36
+GREEN_GLAZED_TERRACOTTA:
+  r: 117
+  g: 142
+  b: 67
+GREEN_SHULKER_BOX:
+  r: 89
+  g: 106
+  b: 46
+GREEN_STAINED_GLASS:
+  r: 102
+  g: 127
+  b: 51
+GREEN_STAINED_GLASS_PANE:
+  r: 100
+  g: 125
+  b: 50
+GREEN_TERRACOTTA:
+  r: 76
+  g: 83
+  b: 42
+GREEN_WOOL:
+  r: 84
+  g: 109
+  b: 27
+GREEN_WOOL_SLAB:
+  r: 84
+  g: 109
+  b: 27
+GREEN_WOOL_STAIRS:
+  r: 84
+  g: 109
+  b: 27
+GRINDSTONE:
+  r: 115
+  g: 108
+  b: 100
+HANGING_ROOTS:
+  r: 161
+  g: 115
+  b: 91
+HAY_BLOCK:
+  r: 166
+  g: 137
+  b: 29
+HEAVY_CORE:
+  r: 86
+  g: 90
+  b: 99
+HEAVY_WEIGHTED_PRESSURE_PLATE:
+  r: 226
+  g: 226
+  b: 226
+HONEYCOMB_BLOCK:
+  r: 229
+  g: 148
+  b: 29
+HONEY_BLOCK:
+  r: 245
+  g: 164
+  b: 35
+HOPPER:
+  r: 67
+  g: 66
+  b: 68
+HORN_CORAL:
+  r: 209
+  g: 186
+  b: 62
+HORN_CORAL_BLOCK:
+  r: 216
+  g: 199
+  b: 66
+HORN_CORAL_FAN:
+  r: 205
+  g: 183
+  b: 61
+HORN_CORAL_WALL_FAN:
+  r: 205
+  g: 183
+  b: 61
+ICE:
+  r: 145
+  g: 183
+  b: 253
+INFESTED_CHISELED_STONE_BRICKS:
+  r: 119
+  g: 118
+  b: 119
+INFESTED_COBBLESTONE:
+  r: 127
+  g: 127
+  b: 127
+INFESTED_CRACKED_STONE_BRICKS:
+  r: 118
+  g: 117
+  b: 118
+INFESTED_DEEPSLATE:
+  r: 82
+  g: 82
+  b: 84
+INFESTED_MOSSY_STONE_BRICKS:
+  r: 115
+  g: 121
+  b: 105
+INFESTED_STONE:
+  r: 125
+  g: 125
+  b: 125
+INFESTED_STONE_BRICKS:
+  r: 122
+  g: 121
+  b: 122
+IRON_BARS:
+  r: 132
+  g: 134
+  b: 130
+IRON_BLOCK:
+  r: 220
+  g: 220
+  b: 220
+IRON_CHAIN:
+  r: 51
+  g: 57
+  b: 74
+IRON_DOOR:
+  r: 194
+  g: 193
+  b: 193
+IRON_ORE:
+  r: 136
+  g: 129
+  b: 122
+IRON_TRAPDOOR:
+  r: 202
+  g: 201
+  b: 201
+JACK_O_LANTERN:
+  r: 199
+  g: 122
+  b: 29
+JIGSAW:
+  r: 57
+  g: 49
+  b: 59
+JUKEBOX:
+  r: 89
+  g: 59
+  b: 41
+JUNGLE_BUTTON:
+  r: 159
+  g: 114
+  b: 79
+JUNGLE_DOOR:
+  r: 162
+  g: 118
+  b: 83
+JUNGLE_FENCE:
+  r: 158
+  g: 113
+  b: 79
+JUNGLE_FENCE_GATE:
+  r: 158
+  g: 114
+  b: 79
+JUNGLE_HANGING_SIGN:
+  r: 149
+  g: 119
+  b: 80
+JUNGLE_LEAVES:
+  r: 44
+  g: 109
+  b: 13
+JUNGLE_LOG:
+  r: 106
+  g: 81
+  b: 40
+JUNGLE_PLANKS:
+  r: 160
+  g: 115
+  b: 80
+JUNGLE_PRESSURE_PLATE:
+  r: 158
+  g: 113
+  b: 79
+JUNGLE_SAPLING:
+  r: 47
+  g: 81
+  b: 16
+JUNGLE_SHELF:
+  r: 151
+  g: 118
+  b: 70
+JUNGLE_SIGN:
+  r: 150
+  g: 108
+  b: 72
+JUNGLE_SLAB:
+  r: 160
+  g: 115
+  b: 80
+JUNGLE_STAIRS:
+  r: 160
+  g: 115
+  b: 80
+JUNGLE_TRAPDOOR:
+  r: 151
+  g: 108
+  b: 76
+JUNGLE_WALL_HANGING_SIGN:
+  r: 148
+  g: 119
+  b: 79
+JUNGLE_WALL_SIGN:
+  r: 160
+  g: 114
+  b: 79
+JUNGLE_WOOD:
+  r: 85
+  g: 67
+  b: 25
+KELP:
+  r: 87
+  g: 140
+  b: 44
+KELP_PLANT:
+  r: 86
+  g: 130
+  b: 42
+LADDER:
+  r: 124
+  g: 96
+  b: 54
+LANTERN:
+  r: 120
+  g: 99
+  b: 84
+LAPIS_BLOCK:
+  r: 30
+  g: 67
+  b: 140
+LAPIS_ORE:
+  r: 107
+  g: 117
+  b: 141
+LARGE_AMETHYST_BUD:
+  r: 161
+  g: 126
+  b: 202
+LARGE_FERN:
+  r: 62
+  g: 95
+  b: 53
+LAVA:
+  r: 212
+  g: 89
+  b: 18
+LAVA_CAULDRON:
+  r: 77
+  g: 69
+  b: 67
+LEAF_LITTER:
+  r: 169
+  g: 169
+  b: 169
+LECTERN:
+  r: 157
+  g: 122
+  b: 72
+LEVER:
+  r: 123
+  g: 117
+  b: 109
+LIGHTNING_ROD:
+  r: 227
+  g: 183
+  b: 169
+LIGHT_BLUE_BED:
+  r: 119
+  g: 142
+  b: 138
+LIGHT_BLUE_CANDLE:
+  r: 45
+  g: 146
+  b: 196
+LIGHT_BLUE_CANDLE_CAKE:
+  r: 187
+  g: 147
+  b: 127
+LIGHT_BLUE_CARPET:
+  r: 58
+  g: 175
+  b: 217
+LIGHT_BLUE_CONCRETE:
+  r: 35
+  g: 137
+  b: 198
+LIGHT_BLUE_CONCRETE_POWDER:
+  r: 74
+  g: 180
+  b: 213
+LIGHT_BLUE_CONCRETE_SLAB:
+  r: 35
+  g: 137
+  b: 198
+LIGHT_BLUE_CONCRETE_STAIRS:
+  r: 35
+  g: 137
+  b: 198
+LIGHT_BLUE_GLAZED_TERRACOTTA:
+  r: 94
+  g: 164
+  b: 208
+LIGHT_BLUE_SHULKER_BOX:
+  r: 61
+  g: 154
+  b: 193
+LIGHT_BLUE_STAINED_GLASS:
+  r: 102
+  g: 153
+  b: 216
+LIGHT_BLUE_STAINED_GLASS_PANE:
+  r: 100
+  g: 150
+  b: 212
+LIGHT_BLUE_TERRACOTTA:
+  r: 113
+  g: 108
+  b: 137
+LIGHT_BLUE_WOOL:
+  r: 58
+  g: 175
+  b: 217
+LIGHT_BLUE_WOOL_SLAB:
+  r: 58
+  g: 175
+  b: 217
+LIGHT_BLUE_WOOL_STAIRS:
+  r: 58
+  g: 175
+  b: 217
+LIGHT_GRAY_BED:
+  r: 150
+  g: 136
+  b: 108
+LIGHT_GRAY_CANDLE:
+  r: 132
+  g: 132
+  b: 121
+LIGHT_GRAY_CANDLE_CAKE:
+  r: 193
+  g: 146
+  b: 122
+LIGHT_GRAY_CARPET:
+  r: 142
+  g: 142
+  b: 134
+LIGHT_GRAY_CONCRETE:
+  r: 125
+  g: 125
+  b: 115
+LIGHT_GRAY_CONCRETE_POWDER:
+  r: 154
+  g: 154
+  b: 148
+LIGHT_GRAY_CONCRETE_SLAB:
+  r: 125
+  g: 125
+  b: 115
+LIGHT_GRAY_CONCRETE_STAIRS:
+  r: 125
+  g: 125
+  b: 115
+LIGHT_GRAY_GLAZED_TERRACOTTA:
+  r: 144
+  g: 166
+  b: 167
+LIGHT_GRAY_SHULKER_BOX:
+  r: 119
+  g: 120
+  b: 105
+LIGHT_GRAY_STAINED_GLASS:
+  r: 153
+  g: 153
+  b: 153
+LIGHT_GRAY_STAINED_GLASS_PANE:
+  r: 150
+  g: 150
+  b: 150
+LIGHT_GRAY_TERRACOTTA:
+  r: 135
+  g: 106
+  b: 97
+LIGHT_GRAY_WOOL:
+  r: 142
+  g: 142
+  b: 134
+LIGHT_GRAY_WOOL_SLAB:
+  r: 142
+  g: 142
+  b: 134
+LIGHT_GRAY_WOOL_STAIRS:
+  r: 142
+  g: 142
+  b: 134
+LIGHT_WEIGHTED_PRESSURE_PLATE:
+  r: 249
+  g: 214
+  b: 66
+LILAC:
+  r: 145
+  g: 124
+  b: 137
+LILY_OF_THE_VALLEY:
+  r: 123
+  g: 174
+  b: 95
+LILY_PAD:
+  r: 59
+  g: 102
+  b: 48
+LIME_BED:
+  r: 143
+  g: 154
+  b: 75
+LIME_CANDLE:
+  r: 108
+  g: 175
+  b: 27
+LIME_CANDLE_CAKE:
+  r: 191
+  g: 149
+  b: 116
+LIME_CARPET:
+  r: 112
+  g: 185
+  b: 25
+LIME_CONCRETE:
+  r: 94
+  g: 168
+  b: 24
+LIME_CONCRETE_POWDER:
+  r: 125
+  g: 189
+  b: 41
+LIME_CONCRETE_SLAB:
+  r: 94
+  g: 168
+  b: 24
+LIME_CONCRETE_STAIRS:
+  r: 94
+  g: 168
+  b: 24
+LIME_GLAZED_TERRACOTTA:
+  r: 162
+  g: 197
+  b: 55
+LIME_SHULKER_BOX:
+  r: 100
+  g: 159
+  b: 36
+LIME_STAINED_GLASS:
+  r: 127
+  g: 204
+  b: 25
+LIME_STAINED_GLASS_PANE:
+  r: 125
+  g: 200
+  b: 24
+LIME_TERRACOTTA:
+  r: 103
+  g: 117
+  b: 52
+LIME_WOOL:
+  r: 112
+  g: 185
+  b: 25
+LIME_WOOL_SLAB:
+  r: 112
+  g: 185
+  b: 25
+LIME_WOOL_STAIRS:
+  r: 112
+  g: 185
+  b: 25
+LODESTONE:
+  r: 128
+  g: 129
+  b: 132
+LOOM:
+  r: 134
+  g: 100
+  b: 71
+MAGENTA_BED:
+  r: 165
+  g: 109
+  b: 122
+MAGENTA_CANDLE:
+  r: 168
+  g: 54
+  b: 156
+MAGENTA_CANDLE_CAKE:
+  r: 195
+  g: 141
+  b: 124
+MAGENTA_CARPET:
+  r: 189
+  g: 68
+  b: 179
+MAGENTA_CONCRETE:
+  r: 169
+  g: 48
+  b: 159
+MAGENTA_CONCRETE_POWDER:
+  r: 192
+  g: 83
+  b: 184
+MAGENTA_CONCRETE_SLAB:
+  r: 169
+  g: 48
+  b: 159
+MAGENTA_CONCRETE_STAIRS:
+  r: 169
+  g: 48
+  b: 159
+MAGENTA_GLAZED_TERRACOTTA:
+  r: 208
+  g: 100
+  b: 191
+MAGENTA_SHULKER_BOX:
+  r: 166
+  g: 67
+  b: 151
+MAGENTA_STAINED_GLASS:
+  r: 178
+  g: 76
+  b: 216
+MAGENTA_STAINED_GLASS_PANE:
+  r: 175
+  g: 75
+  b: 212
+MAGENTA_TERRACOTTA:
+  r: 149
+  g: 88
+  b: 108
+MAGENTA_WOOL:
+  r: 189
+  g: 68
+  b: 179
+MAGENTA_WOOL_SLAB:
+  r: 189
+  g: 68
+  b: 179
+MAGENTA_WOOL_STAIRS:
+  r: 189
+  g: 68
+  b: 179
+MAGMA_BLOCK:
+  r: 142
+  g: 63
+  b: 31
+MANGROVE_BUTTON:
+  r: 117
+  g: 53
+  b: 48
+MANGROVE_DOOR:
+  r: 113
+  g: 49
+  b: 47
+MANGROVE_FENCE:
+  r: 117
+  g: 53
+  b: 47
+MANGROVE_FENCE_GATE:
+  r: 117
+  g: 53
+  b: 48
+MANGROVE_HANGING_SIGN:
+  r: 110
+  g: 56
+  b: 53
+MANGROVE_LEAVES:
+  r: 74
+  g: 99
+  b: 36
+MANGROVE_LOG:
+  r: 90
+  g: 60
+  b: 41
+MANGROVE_PLANKS:
+  r: 117
+  g: 54
+  b: 48
+MANGROVE_PRESSURE_PLATE:
+  r: 116
+  g: 52
+  b: 47
+MANGROVE_PROPAGULE:
+  r: 115
+  g: 159
+  b: 82
+MANGROVE_ROOTS:
+  r: 75
+  g: 59
+  b: 38
+MANGROVE_SHELF:
+  r: 106
+  g: 42
+  b: 40
+MANGROVE_SIGN:
+  r: 112
+  g: 54
+  b: 46
+MANGROVE_SLAB:
+  r: 117
+  g: 54
+  b: 48
+MANGROVE_STAIRS:
+  r: 117
+  g: 54
+  b: 48
+MANGROVE_TRAPDOOR:
+  r: 111
+  g: 47
+  b: 42
+MANGROVE_WALL_HANGING_SIGN:
+  r: 110
+  g: 56
+  b: 53
+MANGROVE_WALL_SIGN:
+  r: 116
+  g: 52
+  b: 47
+MANGROVE_WOOD:
+  r: 83
+  g: 66
+  b: 41
+MEDIUM_AMETHYST_BUD:
+  r: 158
+  g: 120
+  b: 201
+MELON:
+  r: 113
+  g: 145
+  b: 30
+MOSSY_COBBLESTONE:
+  r: 110
+  g: 118
+  b: 94
+MOSSY_COBBLESTONE_SLAB:
+  r: 110
+  g: 118
+  b: 94
+MOSSY_COBBLESTONE_STAIRS:
+  r: 109
+  g: 118
+  b: 94
+MOSSY_COBBLESTONE_WALL:
+  r: 107
+  g: 116
+  b: 90
+MOSSY_STONE_BRICKS:
+  r: 115
+  g: 121
+  b: 105
+MOSSY_STONE_BRICK_SLAB:
+  r: 115
+  g: 121
+  b: 105
+MOSSY_STONE_BRICK_STAIRS:
+  r: 115
+  g: 121
+  b: 105
+MOSSY_STONE_BRICK_WALL:
+  r: 114
+  g: 120
+  b: 103
+MOSS_BLOCK:
+  r: 89
+  g: 109
+  b: 45
+MOSS_CARPET:
+  r: 89
+  g: 110
+  b: 45
+MUD:
+  r: 60
+  g: 57
+  b: 60
+MUDDY_MANGROVE_ROOTS:
+  r: 68
+  g: 58
+  b: 47
+MUD_BRICKS:
+  r: 137
+  g: 103
+  b: 79
+MUD_BRICK_SLAB:
+  r: 137
+  g: 103
+  b: 79
+MUD_BRICK_STAIRS:
+  r: 137
+  g: 103
+  b: 79
+MUD_BRICK_WALL:
+  r: 135
+  g: 102
+  b: 78
+MUSHROOM_STEM:
+  r: 202
+  g: 183
+  b: 152
+MYCELIUM:
+  r: 138
+  g: 116
+  b: 100
+NETHERITE_BLOCK:
+  r: 66
+  g: 61
+  b: 63
+NETHERRACK:
+  r: 97
+  g: 38
+  b: 38
+NETHER_BRICKS:
+  r: 44
+  g: 21
+  b: 26
+NETHER_BRICK_FENCE:
+  r: 43
+  g: 21
+  b: 25
+NETHER_BRICK_SLAB:
+  r: 44
+  g: 21
+  b: 26
+NETHER_BRICK_STAIRS:
+  r: 44
+  g: 21
+  b: 26
+NETHER_BRICK_WALL:
+  r: 44
+  g: 21
+  b: 26
+NETHER_GOLD_ORE:
+  r: 115
+  g: 54
+  b: 42
+NETHER_PORTAL:
+  r: 89
+  g: 11
+  b: 192
+NETHER_QUARTZ_ORE:
+  r: 117
+  g: 65
+  b: 62
+NETHER_SPROUTS:
+  r: 19
+  g: 151
+  b: 133
+NETHER_WART:
+  r: 115
+  g: 17
+  b: 19
+NETHER_WART_BLOCK:
+  r: 114
+  g: 2
+  b: 2
+NOTE_BLOCK:
+  r: 88
+  g: 58
+  b: 40
+OAK_BUTTON:
+  r: 161
+  g: 129
+  b: 77
+OAK_DOOR:
+  r: 139
+  g: 109
+  b: 64
+OAK_FENCE:
+  r: 159
+  g: 128
+  b: 77
+OAK_FENCE_GATE:
+  r: 160
+  g: 129
+  b: 77
+OAK_HANGING_SIGN:
+  r: 157
+  g: 130
+  b: 83
+OAK_LEAVES:
+  r: 40
+  g: 102
+  b: 13
+OAK_LOG:
+  r: 123
+  g: 97
+  b: 58
+OAK_PLANKS:
+  r: 162
+  g: 130
+  b: 78
+OAK_PRESSURE_PLATE:
+  r: 159
+  g: 128
+  b: 77
+OAK_SAPLING:
+  r: 77
+  g: 106
+  b: 40
+OAK_SHELF:
+  r: 134
+  g: 106
+  b: 61
+OAK_SIGN:
+  r: 154
+  g: 124
+  b: 74
+OAK_SLAB:
+  r: 162
+  g: 130
+  b: 78
+OAK_STAIRS:
+  r: 162
+  g: 130
+  b: 78
+OAK_TRAPDOOR:
+  r: 124
+  g: 98
+  b: 56
+OAK_WALL_HANGING_SIGN:
+  r: 156
+  g: 129
+  b: 82
+OAK_WALL_SIGN:
+  r: 161
+  g: 130
+  b: 78
+OAK_WOOD:
+  r: 109
+  g: 85
+  b: 50
+OBSERVER:
+  r: 85
+  g: 84
+  b: 84
+OBSIDIAN:
+  r: 15
+  g: 10
+  b: 24
+OCHRE_FROGLIGHT:
+  r: 247
+  g: 237
+  b: 190
+OPEN_EYEBLOSSOM:
+  r: 140
+  g: 125
+  b: 121
+ORANGE_BED:
+  r: 187
+  g: 130
+  b: 71
+ORANGE_CANDLE:
+  r: 222
+  g: 115
+  b: 19
+ORANGE_CANDLE_CAKE:
+  r: 199
+  g: 145
+  b: 115
+ORANGE_CARPET:
+  r: 240
+  g: 118
+  b: 19
+ORANGE_CONCRETE:
+  r: 224
+  g: 97
+  b: 0
+ORANGE_CONCRETE_POWDER:
+  r: 227
+  g: 131
+  b: 31
+ORANGE_CONCRETE_SLAB:
+  r: 224
+  g: 97
+  b: 0
+ORANGE_CONCRETE_STAIRS:
+  r: 224
+  g: 97
+  b: 0
+ORANGE_GLAZED_TERRACOTTA:
+  r: 154
+  g: 147
+  b: 91
+ORANGE_POPLAR_LEAVES:
+  r: 188
+  g: 86
+  b: 23
+ORANGE_SHULKER_BOX:
+  r: 211
+  g: 108
+  b: 22
+ORANGE_STAINED_GLASS:
+  r: 216
+  g: 127
+  b: 51
+ORANGE_STAINED_GLASS_PANE:
+  r: 212
+  g: 125
+  b: 50
+ORANGE_TERRACOTTA:
+  r: 161
+  g: 83
+  b: 37
+ORANGE_TULIP:
+  r: 93
+  g: 142
+  b: 30
+ORANGE_WOOL:
+  r: 240
+  g: 118
+  b: 19
+ORANGE_WOOL_SLAB:
+  r: 240
+  g: 118
+  b: 19
+ORANGE_WOOL_STAIRS:
+  r: 240
+  g: 118
+  b: 19
+OXEYE_DAISY:
+  r: 179
+  g: 202
+  b: 143
+OXIDIZED_CHISELED_COPPER:
+  r: 83
+  g: 161
+  b: 132
+OXIDIZED_COPPER:
+  r: 82
+  g: 162
+  b: 132
+OXIDIZED_COPPER_BARS:
+  r: 63
+  g: 119
+  b: 98
+OXIDIZED_COPPER_BULB:
+  r: 103
+  g: 142
+  b: 106
+OXIDIZED_COPPER_CHAIN:
+  r: 61
+  g: 118
+  b: 99
+OXIDIZED_COPPER_CHEST:
+  r: 72
+  g: 140
+  b: 116
+OXIDIZED_COPPER_DOOR:
+  r: 81
+  g: 156
+  b: 129
+OXIDIZED_COPPER_GOLEM_STATUE:
+  r: 82
+  g: 162
+  b: 132
+OXIDIZED_COPPER_GRATE:
+  r: 82
+  g: 161
+  b: 131
+OXIDIZED_COPPER_LANTERN:
+  r: 83
+  g: 145
+  b: 115
+OXIDIZED_COPPER_TRAPDOOR:
+  r: 80
+  g: 156
+  b: 128
+OXIDIZED_CUT_COPPER:
+  r: 79
+  g: 153
+  b: 126
+OXIDIZED_CUT_COPPER_SLAB:
+  r: 79
+  g: 153
+  b: 126
+OXIDIZED_CUT_COPPER_STAIRS:
+  r: 79
+  g: 153
+  b: 126
+OXIDIZED_LIGHTNING_ROD:
+  r: 168
+  g: 206
+  b: 192
+PACKED_ICE:
+  r: 141
+  g: 180
+  b: 250
+PACKED_MUD:
+  r: 142
+  g: 106
+  b: 79
+PALE_HANGING_MOSS:
+  r: 101
+  g: 106
+  b: 99
+PALE_MOSS_BLOCK:
+  r: 106
+  g: 112
+  b: 104
+PALE_MOSS_CARPET:
+  r: 106
+  g: 111
+  b: 104
+PALE_OAK_BUTTON:
+  r: 226
+  g: 216
+  b: 215
+PALE_OAK_DOOR:
+  r: 210
+  g: 202
+  b: 201
+PALE_OAK_FENCE:
+  r: 226
+  g: 215
+  b: 214
+PALE_OAK_FENCE_GATE:
+  r: 226
+  g: 215
+  b: 214
+PALE_OAK_HANGING_SIGN:
+  r: 209
+  g: 202
+  b: 204
+PALE_OAK_LEAVES:
+  r: 116
+  g: 121
+  b: 114
+PALE_OAK_LOG:
+  r: 124
+  g: 114
+  b: 112
+PALE_OAK_PLANKS:
+  r: 227
+  g: 217
+  b: 216
+PALE_OAK_PRESSURE_PLATE:
+  r: 225
+  g: 215
+  b: 214
+PALE_OAK_SAPLING:
+  r: 109
+  g: 105
+  b: 99
+PALE_OAK_SHELF:
+  r: 222
+  g: 211
+  b: 210
+PALE_OAK_SIGN:
+  r: 206
+  g: 195
+  b: 194
+PALE_OAK_SLAB:
+  r: 227
+  g: 217
+  b: 216
+PALE_OAK_STAIRS:
+  r: 227
+  g: 217
+  b: 216
+PALE_OAK_TRAPDOOR:
+  r: 231
+  g: 221
+  b: 220
+PALE_OAK_WALL_HANGING_SIGN:
+  r: 208
+  g: 200
+  b: 202
+PALE_OAK_WALL_SIGN:
+  r: 224
+  g: 213
+  b: 213
+PALE_OAK_WOOD:
+  r: 87
+  g: 77
+  b: 75
+PEARLESCENT_FROGLIGHT:
+  r: 238
+  g: 230
+  b: 232
+PEONY:
+  r: 108
+  g: 113
+  b: 116
+PETRIFIED_OAK_SLAB:
+  r: 162
+  g: 130
+  b: 78
+PIGLIN_HEAD:
+  r: 200
+  g: 128
+  b: 91
+PIGLIN_WALL_HEAD:
+  r: 200
+  g: 128
+  b: 91
+PINK_BED:
+  r: 182
+  g: 129
+  b: 117
+PINK_CANDLE:
+  r: 213
+  g: 115
+  b: 146
+PINK_CANDLE_CAKE:
+  r: 198
+  g: 145
+  b: 124
+PINK_CARPET:
+  r: 237
+  g: 141
+  b: 172
+PINK_CONCRETE:
+  r: 213
+  g: 101
+  b: 142
+PINK_CONCRETE_POWDER:
+  r: 228
+  g: 153
+  b: 181
+PINK_CONCRETE_SLAB:
+  r: 213
+  g: 101
+  b: 142
+PINK_CONCRETE_STAIRS:
+  r: 213
+  g: 101
+  b: 142
+PINK_GLAZED_TERRACOTTA:
+  r: 235
+  g: 154
+  b: 181
+PINK_PETALS:
+  r: 227
+  g: 178
+  b: 206
+PINK_SHULKER_BOX:
+  r: 212
+  g: 118
+  b: 144
+PINK_STAINED_GLASS:
+  r: 242
+  g: 127
+  b: 165
+PINK_STAINED_GLASS_PANE:
+  r: 238
+  g: 125
+  b: 162
+PINK_TERRACOTTA:
+  r: 161
+  g: 78
+  b: 78
+PINK_TULIP:
+  r: 99
+  g: 157
+  b: 78
+PINK_WOOL:
+  r: 237
+  g: 141
+  b: 172
+PINK_WOOL_SLAB:
+  r: 237
+  g: 141
+  b: 172
+PINK_WOOL_STAIRS:
+  r: 237
+  g: 141
+  b: 172
+PISTON:
+  r: 105
+  g: 101
+  b: 95
+PISTON_HEAD:
+  r: 149
+  g: 133
+  b: 93
+PITCHER_CROP:
+  r: 160
+  g: 145
+  b: 103
+PITCHER_PLANT:
+  r: 113
+  g: 135
+  b: 141
+PODZOL:
+  r: 139
+  g: 113
+  b: 88
+POINTED_DRIPSTONE:
+  r: 132
+  g: 106
+  b: 91
+POLISHED_ANDESITE:
+  r: 132
+  g: 134
+  b: 133
+POLISHED_ANDESITE_SLAB:
+  r: 132
+  g: 134
+  b: 133
+POLISHED_ANDESITE_STAIRS:
+  r: 131
+  g: 134
+  b: 133
+POLISHED_BASALT:
+  r: 92
+  g: 91
+  b: 94
+POLISHED_BLACKSTONE:
+  r: 53
+  g: 48
+  b: 56
+POLISHED_BLACKSTONE_BRICKS:
+  r: 48
+  g: 42
+  b: 49
+POLISHED_BLACKSTONE_BRICK_SLAB:
+  r: 48
+  g: 42
+  b: 49
+POLISHED_BLACKSTONE_BRICK_STAIRS:
+  r: 48
+  g: 42
+  b: 49
+POLISHED_BLACKSTONE_BRICK_WALL:
+  r: 47
+  g: 41
+  b: 48
+POLISHED_BLACKSTONE_BUTTON:
+  r: 47
+  g: 42
+  b: 47
+POLISHED_BLACKSTONE_PRESSURE_PLATE:
+  r: 51
+  g: 46
+  b: 54
+POLISHED_BLACKSTONE_SLAB:
+  r: 53
+  g: 48
+  b: 56
+POLISHED_BLACKSTONE_STAIRS:
+  r: 52
+  g: 47
+  b: 55
+POLISHED_BLACKSTONE_WALL:
+  r: 54
+  g: 50
+  b: 59
+POLISHED_CINNABAR:
+  r: 152
+  g: 57
+  b: 55
+POLISHED_CINNABAR_SLAB:
+  r: 152
+  g: 57
+  b: 55
+POLISHED_CINNABAR_STAIRS:
+  r: 151
+  g: 56
+  b: 54
+POLISHED_CINNABAR_WALL:
+  r: 156
+  g: 59
+  b: 56
+POLISHED_DEEPSLATE:
+  r: 72
+  g: 72
+  b: 73
+POLISHED_DEEPSLATE_SLAB:
+  r: 72
+  g: 72
+  b: 73
+POLISHED_DEEPSLATE_STAIRS:
+  r: 71
+  g: 71
+  b: 72
+POLISHED_DEEPSLATE_WALL:
+  r: 74
+  g: 74
+  b: 75
+POLISHED_DIORITE:
+  r: 192
+  g: 193
+  b: 194
+POLISHED_DIORITE_SLAB:
+  r: 192
+  g: 193
+  b: 194
+POLISHED_DIORITE_STAIRS:
+  r: 191
+  g: 191
+  b: 193
+POLISHED_GRANITE:
+  r: 154
+  g: 106
+  b: 89
+POLISHED_GRANITE_SLAB:
+  r: 154
+  g: 106
+  b: 89
+POLISHED_GRANITE_STAIRS:
+  r: 153
+  g: 105
+  b: 88
+POLISHED_SULFUR:
+  r: 188
+  g: 170
+  b: 91
+POLISHED_SULFUR_SLAB:
+  r: 188
+  g: 170
+  b: 91
+POLISHED_SULFUR_STAIRS:
+  r: 186
+  g: 168
+  b: 90
+POLISHED_SULFUR_WALL:
+  r: 192
+  g: 176
+  b: 93
+POLISHED_TUFF:
+  r: 97
+  g: 104
+  b: 99
+POLISHED_TUFF_SLAB:
+  r: 97
+  g: 104
+  b: 99
+POLISHED_TUFF_STAIRS:
+  r: 96
+  g: 103
+  b: 99
+POLISHED_TUFF_WALL:
+  r: 99
+  g: 106
+  b: 102
+POPLAR_BUTTON:
+  r: 148
+  g: 136
+  b: 126
+POPLAR_DOOR:
+  r: 150
+  g: 138
+  b: 127
+POPLAR_FENCE:
+  r: 148
+  g: 135
+  b: 126
+POPLAR_FENCE_GATE:
+  r: 148
+  g: 136
+  b: 126
+POPLAR_HANGING_SIGN:
+  r: 145
+  g: 136
+  b: 128
+POPLAR_LOG:
+  r: 98
+  g: 81
+  b: 65
+POPLAR_PLANKS:
+  r: 149
+  g: 137
+  b: 127
+POPLAR_PRESSURE_PLATE:
+  r: 148
+  g: 135
+  b: 126
+POPLAR_SAPLING:
+  r: 143
+  g: 79
+  b: 37
+POPLAR_SHELF:
+  r: 144
+  g: 131
+  b: 123
+POPLAR_SIGN:
+  r: 140
+  g: 127
+  b: 116
+POPLAR_SLAB:
+  r: 149
+  g: 137
+  b: 127
+POPLAR_STAIRS:
+  r: 149
+  g: 137
+  b: 127
+POPLAR_TRAPDOOR:
+  r: 151
+  g: 139
+  b: 128
+POPLAR_WALL_HANGING_SIGN:
+  r: 144
+  g: 134
+  b: 127
+POPLAR_WALL_SIGN:
+  r: 150
+  g: 137
+  b: 127
+POPLAR_WOOD:
+  r: 79
+  g: 60
+  b: 42
+POPPY:
+  r: 128
+  g: 64
+  b: 37
+POTATOES:
+  r: 74
+  g: 130
+  b: 44
+POTENT_SULFUR:
+  r: 211
+  g: 208
+  b: 97
+POTTED_ACACIA_SAPLING:
+  r: 121
+  g: 88
+  b: 41
+POTTED_ALLIUM:
+  r: 130
+  g: 82
+  b: 77
+POTTED_AZALEA_BUSH:
+  r: 104
+  g: 102
+  b: 48
+POTTED_AZURE_BLUET:
+  r: 133
+  g: 97
+  b: 68
+POTTED_BAMBOO:
+  r: 114
+  g: 91
+  b: 43
+POTTED_BIRCH_SAPLING:
+  r: 125
+  g: 103
+  b: 63
+POTTED_BLUE_ORCHID:
+  r: 107
+  g: 88
+  b: 77
+POTTED_BROWN_MUSHROOM:
+  r: 129
+  g: 77
+  b: 60
+POTTED_CACTUS:
+  r: 109
+  g: 103
+  b: 50
+POTTED_CHERRY_SAPLING:
+  r: 140
+  g: 89
+  b: 91
+POTTED_CLOSED_EYEBLOSSOM:
+  r: 120
+  g: 76
+  b: 64
+POTTED_CORNFLOWER:
+  r: 116
+  g: 78
+  b: 69
+POTTED_CRIMSON_FUNGUS:
+  r: 128
+  g: 62
+  b: 47
+POTTED_CRIMSON_ROOTS:
+  r: 124
+  g: 53
+  b: 50
+POTTED_DANDELION:
+  r: 127
+  g: 86
+  b: 52
+POTTED_DARK_OAK_SAPLING:
+  r: 98
+  g: 77
+  b: 44
+POTTED_DEAD_BUSH:
+  r: 118
+  g: 72
+  b: 49
+POTTED_FERN:
+  r: 101
+  g: 77
+  b: 53
+POTTED_FLOWERING_AZALEA_BUSH:
+  r: 112
+  g: 99
+  b: 62
+POTTED_GOLDEN_DANDELION:
+  r: 129
+  g: 74
+  b: 51
+POTTED_JUNGLE_SAPLING:
+  r: 97
+  g: 73
+  b: 41
+POTTED_LILY_OF_THE_VALLEY:
+  r: 123
+  g: 94
+  b: 63
+POTTED_MANGROVE_PROPAGULE:
+  r: 116
+  g: 99
+  b: 62
+POTTED_OAK_SAPLING:
+  r: 105
+  g: 84
+  b: 48
+POTTED_OPEN_EYEBLOSSOM:
+  r: 128
+  g: 84
+  b: 71
+POTTED_ORANGE_TULIP:
+  r: 117
+  g: 83
+  b: 49
+POTTED_OXEYE_DAISY:
+  r: 136
+  g: 100
+  b: 74
+POTTED_PALE_OAK_SAPLING:
+  r: 118
+  g: 83
+  b: 71
+POTTED_PINK_TULIP:
+  r: 119
+  g: 86
+  b: 58
+POTTED_POPLAR_SAPLING:
+  r: 129
+  g: 72
+  b: 48
+POTTED_POPPY:
+  r: 124
+  g: 68
+  b: 50
+POTTED_RED_MUSHROOM:
+  r: 139
+  g: 70
+  b: 55
+POTTED_RED_TULIP:
+  r: 116
+  g: 82
+  b: 48
+POTTED_SPRUCE_SAPLING:
+  r: 97
+  g: 66
+  b: 48
+POTTED_TORCHFLOWER:
+  r: 115
+  g: 81
+  b: 62
+POTTED_WARPED_FUNGUS:
+  r: 112
+  g: 78
+  b: 61
+POTTED_WARPED_ROOTS:
+  r: 92
+  g: 89
+  b: 74
+POTTED_WHITE_TULIP:
+  r: 117
+  g: 89
+  b: 57
+POTTED_WITHER_ROSE:
+  r: 108
+  g: 64
+  b: 48
+POWDER_SNOW:
+  r: 248
+  g: 253
+  b: 253
+POWDER_SNOW_CAULDRON:
+  r: 79
+  g: 79
+  b: 80
+POWERED_RAIL:
+  r: 146
+  g: 109
+  b: 74
+PRISMARINE:
+  r: 98
+  g: 156
+  b: 149
+PRISMARINE_BRICKS:
+  r: 99
+  g: 171
+  b: 158
+PRISMARINE_BRICK_SLAB:
+  r: 99
+  g: 171
+  b: 158
+PRISMARINE_BRICK_STAIRS:
+  r: 98
+  g: 170
+  b: 157
+PRISMARINE_SLAB:
+  r: 98
+  g: 156
+  b: 149
+PRISMARINE_STAIRS:
+  r: 99
+  g: 156
+  b: 150
+PRISMARINE_WALL:
+  r: 96
+  g: 155
+  b: 148
+PUMPKIN:
+  r: 196
+  g: 116
+  b: 24
+PURPLE_BED:
+  r: 145
+  g: 104
+  b: 124
+PURPLE_CANDLE:
+  r: 112
+  g: 35
+  b: 153
+PURPLE_CANDLE_CAKE:
+  r: 191
+  g: 140
+  b: 124
+PURPLE_CARPET:
+  r: 121
+  g: 42
+  b: 172
+PURPLE_CONCRETE:
+  r: 100
+  g: 31
+  b: 156
+PURPLE_CONCRETE_POWDER:
+  r: 131
+  g: 55
+  b: 177
+PURPLE_CONCRETE_SLAB:
+  r: 100
+  g: 31
+  b: 156
+PURPLE_CONCRETE_STAIRS:
+  r: 100
+  g: 31
+  b: 156
+PURPLE_GLAZED_TERRACOTTA:
+  r: 109
+  g: 47
+  b: 152
+PURPLE_SHULKER_BOX:
+  r: 106
+  g: 50
+  b: 144
+PURPLE_STAINED_GLASS:
+  r: 127
+  g: 63
+  b: 178
+PURPLE_STAINED_GLASS_PANE:
+  r: 125
+  g: 62
+  b: 175
+PURPLE_TERRACOTTA:
+  r: 118
+  g: 70
+  b: 86
+PURPLE_WOOL:
+  r: 121
+  g: 42
+  b: 172
+PURPLE_WOOL_SLAB:
+  r: 121
+  g: 42
+  b: 172
+PURPLE_WOOL_STAIRS:
+  r: 121
+  g: 42
+  b: 172
+PURPUR_BLOCK:
+  r: 169
+  g: 125
+  b: 169
+PURPUR_PILLAR:
+  r: 171
+  g: 129
+  b: 171
+PURPUR_SLAB:
+  r: 169
+  g: 125
+  b: 169
+PURPUR_STAIRS:
+  r: 169
+  g: 125
+  b: 169
+QUARTZ_BLOCK:
+  r: 235
+  g: 229
+  b: 222
+QUARTZ_BRICKS:
+  r: 234
+  g: 229
+  b: 221
+QUARTZ_PILLAR:
+  r: 235
+  g: 230
+  b: 223
+QUARTZ_SLAB:
+  r: 235
+  g: 229
+  b: 222
+QUARTZ_STAIRS:
+  r: 235
+  g: 229
+  b: 222
+RAIL:
+  r: 127
+  g: 113
+  b: 89
+RAW_COPPER_BLOCK:
+  r: 154
+  g: 105
+  b: 79
+RAW_GOLD_BLOCK:
+  r: 221
+  g: 169
+  b: 46
+RAW_IRON_BLOCK:
+  r: 166
+  g: 135
+  b: 107
+REDSTONE_BLOCK:
+  r: 175
+  g: 24
+  b: 5
+REDSTONE_LAMP:
+  r: 119
+  g: 78
+  b: 45
+REDSTONE_ORE:
+  r: 140
+  g: 109
+  b: 109
+REDSTONE_TORCH:
+  r: 144
+  g: 61
+  b: 42
+REDSTONE_WALL_TORCH:
+  r: 144
+  g: 61
+  b: 42
+RED_BED:
+  r: 162
+  g: 105
+  b: 79
+RED_CANDLE:
+  r: 165
+  g: 49
+  b: 40
+RED_CANDLE_CAKE:
+  r: 195
+  g: 140
+  b: 117
+RED_CARPET:
+  r: 160
+  g: 39
+  b: 34
+RED_CONCRETE:
+  r: 142
+  g: 32
+  b: 32
+RED_CONCRETE_POWDER:
+  r: 168
+  g: 54
+  b: 50
+RED_CONCRETE_SLAB:
+  r: 142
+  g: 32
+  b: 32
+RED_CONCRETE_STAIRS:
+  r: 142
+  g: 32
+  b: 32
+RED_GLAZED_TERRACOTTA:
+  r: 181
+  g: 59
+  b: 53
+RED_MUSHROOM:
+  r: 216
+  g: 75
+  b: 67
+RED_MUSHROOM_BLOCK:
+  r: 200
+  g: 108
+  b: 82
+RED_NETHER_BRICKS:
+  r: 69
+  g: 7
+  b: 9
+RED_NETHER_BRICK_SLAB:
+  r: 69
+  g: 7
+  b: 9
+RED_NETHER_BRICK_STAIRS:
+  r: 69
+  g: 6
+  b: 8
+RED_NETHER_BRICK_WALL:
+  r: 69
+  g: 7
+  b: 9
+RED_POPLAR_LEAVES:
+  r: 153
+  g: 44
+  b: 39
+RED_SAND:
+  r: 190
+  g: 102
+  b: 33
+RED_SANDSTONE:
+  r: 185
+  g: 98
+  b: 29
+RED_SANDSTONE_SLAB:
+  r: 185
+  g: 98
+  b: 29
+RED_SANDSTONE_STAIRS:
+  r: 185
+  g: 98
+  b: 29
+RED_SANDSTONE_WALL:
+  r: 187
+  g: 99
+  b: 29
+RED_SHRUB:
+  r: 121
+  g: 35
+  b: 21
+RED_SHULKER_BOX:
+  r: 136
+  g: 48
+  b: 40
+RED_STAINED_GLASS:
+  r: 153
+  g: 51
+  b: 51
+RED_STAINED_GLASS_PANE:
+  r: 150
+  g: 50
+  b: 50
+RED_TERRACOTTA:
+  r: 143
+  g: 61
+  b: 46
+RED_TULIP:
+  r: 89
+  g: 128
+  b: 32
+RED_WOOL:
+  r: 160
+  g: 39
+  b: 34
+RED_WOOL_SLAB:
+  r: 160
+  g: 39
+  b: 34
+RED_WOOL_STAIRS:
+  r: 160
+  g: 39
+  b: 34
+REINFORCED_DEEPSLATE:
+  r: 94
+  g: 100
+  b: 93
+REPEATER:
+  r: 158
+  g: 137
+  b: 135
+REPEATING_COMMAND_BLOCK:
+  r: 128
+  g: 109
+  b: 171
+RESIN_BLOCK:
+  r: 217
+  g: 99
+  b: 25
+RESIN_BRICKS:
+  r: 205
+  g: 88
+  b: 24
+RESIN_BRICK_SLAB:
+  r: 205
+  g: 88
+  b: 24
+RESIN_BRICK_STAIRS:
+  r: 205
+  g: 88
+  b: 24
+RESIN_BRICK_WALL:
+  r: 206
+  g: 89
+  b: 23
+RESIN_CLUMP:
+  r: 223
+  g: 111
+  b: 27
+RESPAWN_ANCHOR:
+  r: 46
+  g: 24
+  b: 75
+ROOTED_DIRT:
+  r: 144
+  g: 103
+  b: 76
+ROSE_BUSH:
+  r: 114
+  g: 74
+  b: 37
+SAND:
+  r: 219
+  g: 207
+  b: 163
+SANDSTONE:
+  r: 217
+  g: 204
+  b: 157
+SANDSTONE_SLAB:
+  r: 217
+  g: 205
+  b: 158
+SANDSTONE_STAIRS:
+  r: 218
+  g: 205
+  b: 159
+SANDSTONE_WALL:
+  r: 216
+  g: 203
+  b: 156
+SCAFFOLDING:
+  r: 183
+  g: 154
+  b: 76
+SCULK:
+  r: 12
+  g: 29
+  b: 36
+SCULK_CATALYST:
+  r: 68
+  g: 88
+  b: 86
+SCULK_SENSOR:
+  r: 10
+  g: 55
+  b: 64
+SCULK_SHRIEKER:
+  r: 79
+  g: 101
+  b: 93
+SCULK_VEIN:
+  r: 7
+  g: 48
+  b: 57
+SEAGRASS:
+  r: 50
+  g: 126
+  b: 8
+SEA_LANTERN:
+  r: 172
+  g: 199
+  b: 190
+SEA_PICKLE:
+  r: 89
+  g: 95
+  b: 36
+SHELF_MUSHROOM:
+  r: 191
+  g: 137
+  b: 83
+SHORT_DRY_GRASS:
+  r: 187
+  g: 158
+  b: 108
+SHORT_GRASS:
+  r: 70
+  g: 107
+  b: 61
+SHROOMLIGHT:
+  r: 240
+  g: 146
+  b: 70
+SHULKER_BOX:
+  r: 145
+  g: 109
+  b: 138
+SKELETON_SKULL:
+  r: 174
+  g: 174
+  b: 174
+SKELETON_WALL_SKULL:
+  r: 174
+  g: 174
+  b: 174
+SLIME_BLOCK:
+  r: 110
+  g: 191
+  b: 90
+SMALL_AMETHYST_BUD:
+  r: 131
+  g: 99
+  b: 192
+SMALL_DRIPLEAF:
+  r: 95
+  g: 121
+  b: 45
+SMITHING_TABLE:
+  r: 57
+  g: 38
+  b: 40
+SMOKER:
+  r: 100
+  g: 91
+  b: 79
+SMOOTH_BASALT:
+  r: 72
+  g: 72
+  b: 78
+SMOOTH_QUARTZ:
+  r: 236
+  g: 230
+  b: 223
+SMOOTH_QUARTZ_SLAB:
+  r: 236
+  g: 230
+  b: 223
+SMOOTH_QUARTZ_STAIRS:
+  r: 236
+  g: 230
+  b: 224
+SMOOTH_RED_SANDSTONE:
+  r: 181
+  g: 97
+  b: 31
+SMOOTH_RED_SANDSTONE_SLAB:
+  r: 181
+  g: 97
+  b: 31
+SMOOTH_RED_SANDSTONE_STAIRS:
+  r: 181
+  g: 97
+  b: 31
+SMOOTH_SANDSTONE:
+  r: 223
+  g: 214
+  b: 170
+SMOOTH_SANDSTONE_SLAB:
+  r: 223
+  g: 214
+  b: 170
+SMOOTH_SANDSTONE_STAIRS:
+  r: 223
+  g: 214
+  b: 170
+SMOOTH_STONE:
+  r: 158
+  g: 158
+  b: 158
+SMOOTH_STONE_SLAB:
+  r: 163
+  g: 163
+  b: 163
+SNIFFER_EGG:
+  r: 92
+  g: 69
+  b: 47
+SNOW:
+  r: 248
+  g: 254
+  b: 254
+SNOW_BLOCK:
+  r: 249
+  g: 254
+  b: 254
+SOUL_CAMPFIRE:
+  r: 106
+  g: 109
+  b: 84
+SOUL_FIRE:
+  r: 53
+  g: 192
+  b: 197
+SOUL_LANTERN:
+  r: 76
+  g: 109
+  b: 124
+SOUL_SAND:
+  r: 81
+  g: 62
+  b: 50
+SOUL_SOIL:
+  r: 75
+  g: 57
+  b: 46
+SOUL_TORCH:
+  r: 108
+  g: 118
+  b: 94
+SOUL_WALL_TORCH:
+  r: 108
+  g: 118
+  b: 94
+SPAWNER:
+  r: 36
+  g: 46
+  b: 62
+SPONGE:
+  r: 195
+  g: 192
+  b: 74
+SPORE_BLOSSOM:
+  r: 184
+  g: 107
+  b: 132
+SPRUCE_BUTTON:
+  r: 113
+  g: 84
+  b: 48
+SPRUCE_DOOR:
+  r: 108
+  g: 82
+  b: 49
+SPRUCE_FENCE:
+  r: 113
+  g: 83
+  b: 47
+SPRUCE_FENCE_GATE:
+  r: 113
+  g: 83
+  b: 48
+SPRUCE_HANGING_SIGN:
+  r: 106
+  g: 85
+  b: 56
+SPRUCE_LEAVES:
+  r: 47
+  g: 75
+  b: 47
+SPRUCE_LOG:
+  r: 75
+  g: 51
+  b: 26
+SPRUCE_PLANKS:
+  r: 114
+  g: 84
+  b: 48
+SPRUCE_PRESSURE_PLATE:
+  r: 113
+  g: 83
+  b: 47
+SPRUCE_SAPLING:
+  r: 44
+  g: 60
+  b: 36
+SPRUCE_SHELF:
+  r: 102
+  g: 82
+  b: 46
+SPRUCE_SIGN:
+  r: 104
+  g: 76
+  b: 43
+SPRUCE_SLAB:
+  r: 114
+  g: 84
+  b: 48
+SPRUCE_STAIRS:
+  r: 114
+  g: 84
+  b: 48
+SPRUCE_TRAPDOOR:
+  r: 104
+  g: 79
+  b: 47
+SPRUCE_WALL_HANGING_SIGN:
+  r: 107
+  g: 85
+  b: 56
+SPRUCE_WALL_SIGN:
+  r: 111
+  g: 83
+  b: 47
+SPRUCE_WOOD:
+  r: 58
+  g: 37
+  b: 16
+STICKY_PISTON:
+  r: 102
+  g: 103
+  b: 95
+STONE:
+  r: 125
+  g: 125
+  b: 125
+STONECUTTER:
+  r: 127
+  g: 119
+  b: 111
+STONE_BRICKS:
+  r: 122
+  g: 121
+  b: 122
+STONE_BRICK_SLAB:
+  r: 122
+  g: 121
+  b: 122
+STONE_BRICK_STAIRS:
+  r: 122
+  g: 121
+  b: 122
+STONE_BRICK_WALL:
+  r: 121
+  g: 121
+  b: 121
+STONE_BUTTON:
+  r: 128
+  g: 128
+  b: 128
+STONE_PRESSURE_PLATE:
+  r: 125
+  g: 125
+  b: 125
+STONE_SLAB:
+  r: 125
+  g: 125
+  b: 125
+STONE_STAIRS:
+  r: 125
+  g: 125
+  b: 125
+STRAW_BED:
+  r: 155
+  g: 129
+  b: 26
+STRIPPED_ACACIA_LOG:
+  r: 171
+  g: 92
+  b: 57
+STRIPPED_ACACIA_WOOD:
+  r: 174
+  g: 92
+  b: 59
+STRIPPED_BAMBOO_BLOCK:
+  r: 188
+  g: 168
+  b: 77
+STRIPPED_BIRCH_LOG:
+  r: 195
+  g: 174
+  b: 117
+STRIPPED_BIRCH_WOOD:
+  r: 196
+  g: 176
+  b: 118
+STRIPPED_CHERRY_LOG:
+  r: 217
+  g: 151
+  b: 151
+STRIPPED_CHERRY_WOOD:
+  r: 215
+  g: 145
+  b: 148
+STRIPPED_CRIMSON_HYPHAE:
+  r: 137
+  g: 57
+  b: 90
+STRIPPED_CRIMSON_STEM:
+  r: 132
+  g: 56
+  b: 87
+STRIPPED_DARK_OAK_LOG:
+  r: 70
+  g: 52
+  b: 31
+STRIPPED_DARK_OAK_WOOD:
+  r: 72
+  g: 56
+  b: 36
+STRIPPED_JUNGLE_LOG:
+  r: 169
+  g: 129
+  b: 83
+STRIPPED_JUNGLE_WOOD:
+  r: 171
+  g: 132
+  b: 84
+STRIPPED_MANGROVE_LOG:
+  r: 116
+  g: 50
+  b: 46
+STRIPPED_MANGROVE_WOOD:
+  r: 119
+  g: 54
+  b: 47
+STRIPPED_OAK_LOG:
+  r: 171
+  g: 139
+  b: 83
+STRIPPED_OAK_WOOD:
+  r: 177
+  g: 144
+  b: 86
+STRIPPED_PALE_OAK_LOG:
+  r: 242
+  g: 234
+  b: 233
+STRIPPED_PALE_OAK_WOOD:
+  r: 245
+  g: 238
+  b: 236
+STRIPPED_POPLAR_LOG:
+  r: 160
+  g: 148
+  b: 136
+STRIPPED_POPLAR_WOOD:
+  r: 164
+  g: 152
+  b: 139
+STRIPPED_SPRUCE_LOG:
+  r: 114
+  g: 88
+  b: 51
+STRIPPED_SPRUCE_WOOD:
+  r: 115
+  g: 89
+  b: 52
+STRIPPED_WARPED_HYPHAE:
+  r: 57
+  g: 150
+  b: 147
+STRIPPED_WARPED_STEM:
+  r: 55
+  g: 143
+  b: 140
+STRUCTURE_BLOCK:
+  r: 75
+  g: 63
+  b: 77
+STRUCTURE_VOID:
+  r: 24
+  g: 86
+  b: 93
+SUGAR_CANE:
+  r: 148
+  g: 192
+  b: 101
+SULFUR:
+  r: 189
+  g: 175
+  b: 101
+SULFUR_BRICKS:
+  r: 186
+  g: 167
+  b: 91
+SULFUR_BRICK_SLAB:
+  r: 186
+  g: 167
+  b: 91
+SULFUR_BRICK_STAIRS:
+  r: 186
+  g: 167
+  b: 91
+SULFUR_BRICK_WALL:
+  r: 185
+  g: 165
+  b: 90
+SULFUR_SLAB:
+  r: 189
+  g: 175
+  b: 101
+SULFUR_SPIKE:
+  r: 185
+  g: 173
+  b: 96
+SULFUR_STAIRS:
+  r: 189
+  g: 175
+  b: 101
+SULFUR_WALL:
+  r: 189
+  g: 174
+  b: 102
+SUNFLOWER:
+  r: 78
+  g: 141
+  b: 33
+SUSPICIOUS_GRAVEL:
+  r: 127
+  g: 122
+  b: 121
+SUSPICIOUS_SAND:
+  r: 214
+  g: 199
+  b: 153
+SWEET_BERRY_BUSH:
+  r: 54
+  g: 87
+  b: 55
+TALL_DRY_GRASS:
+  r: 196
+  g: 171
+  b: 122
+TALL_GRASS:
+  r: 67
+  g: 102
+  b: 58
+TALL_SEAGRASS:
+  r: 52
+  g: 128
+  b: 9
+TARGET:
+  r: 228
+  g: 174
+  b: 164
+TERRACOTTA:
+  r: 152
+  g: 94
+  b: 67
+TEST_BLOCK:
+  r: 147
+  g: 159
+  b: 155
+TEST_INSTANCE_BLOCK:
+  r: 127
+  g: 120
+  b: 119
+TINTED_GLASS:
+  r: 44
+  g: 38
+  b: 46
+TNT:
+  r: 173
+  g: 80
+  b: 73
+TORCH:
+  r: 142
+  g: 116
+  b: 64
+TORCHFLOWER:
+  r: 100
+  g: 101
+  b: 77
+TORCHFLOWER_CROP:
+  r: 46
+  g: 103
+  b: 71
+TRAPPED_CHEST:
+  r: 105
+  g: 77
+  b: 35
+TRIAL_SPAWNER:
+  r: 47
+  g: 66
+  b: 81
+TRIPWIRE:
+  r: 123
+  g: 123
+  b: 123
+TRIPWIRE_HOOK:
+  r: 154
+  g: 130
+  b: 89
+TUBE_CORAL:
+  r: 47
+  g: 83
+  b: 197
+TUBE_CORAL_BLOCK:
+  r: 49
+  g: 87
+  b: 206
+TUBE_CORAL_FAN:
+  r: 50
+  g: 91
+  b: 208
+TUBE_CORAL_WALL_FAN:
+  r: 50
+  g: 91
+  b: 208
+TUFF:
+  r: 108
+  g: 109
+  b: 102
+TUFF_BRICKS:
+  r: 98
+  g: 102
+  b: 95
+TUFF_BRICK_SLAB:
+  r: 98
+  g: 102
+  b: 95
+TUFF_BRICK_STAIRS:
+  r: 97
+  g: 102
+  b: 95
+TUFF_BRICK_WALL:
+  r: 96
+  g: 101
+  b: 95
+TUFF_SLAB:
+  r: 108
+  g: 109
+  b: 102
+TUFF_STAIRS:
+  r: 108
+  g: 109
+  b: 102
+TUFF_WALL:
+  r: 109
+  g: 110
+  b: 103
+TURTLE_EGG:
+  r: 216
+  g: 214
+  b: 179
+TWISTING_VINES:
+  r: 20
+  g: 143
+  b: 124
+TWISTING_VINES_PLANT:
+  r: 20
+  g: 135
+  b: 122
+VAULT:
+  r: 50
+  g: 60
+  b: 66
+VERDANT_FROGLIGHT:
+  r: 217
+  g: 237
+  b: 214
+VINE:
+  r: 32
+  g: 82
+  b: 10
+WALL_TORCH:
+  r: 142
+  g: 116
+  b: 64
+WARPED_BUTTON:
+  r: 41
+  g: 103
+  b: 98
+WARPED_DOOR:
+  r: 44
+  g: 125
+  b: 119
+WARPED_FENCE:
+  r: 42
+  g: 103
+  b: 98
+WARPED_FENCE_GATE:
+  r: 43
+  g: 103
+  b: 97
+WARPED_FUNGUS:
+  r: 74
+  g: 109
+  b: 87
+WARPED_HANGING_SIGN:
+  r: 55
+  g: 135
+  b: 133
+WARPED_HYPHAE:
+  r: 58
+  g: 58
+  b: 77
+WARPED_NYLIUM:
+  r: 71
+  g: 66
+  b: 62
+WARPED_PLANKS:
+  r: 43
+  g: 104
+  b: 99
+WARPED_PRESSURE_PLATE:
+  r: 42
+  g: 102
+  b: 96
+WARPED_ROOTS:
+  r: 20
+  g: 138
+  b: 124
+WARPED_SHELF:
+  r: 49
+  g: 137
+  b: 129
+WARPED_SIGN:
+  r: 42
+  g: 100
+  b: 98
+WARPED_SLAB:
+  r: 43
+  g: 104
+  b: 99
+WARPED_STAIRS:
+  r: 43
+  g: 104
+  b: 98
+WARPED_STEM:
+  r: 56
+  g: 75
+  b: 88
+WARPED_TRAPDOOR:
+  r: 46
+  g: 117
+  b: 109
+WARPED_WALL_HANGING_SIGN:
+  r: 54
+  g: 134
+  b: 133
+WARPED_WALL_SIGN:
+  r: 39
+  g: 107
+  b: 101
+WARPED_WART_BLOCK:
+  r: 22
+  g: 119
+  b: 121
+WATER:
+  r: 43
+  g: 81
+  b: 158
+WATER_CAULDRON:
+  r: 67
+  g: 68
+  b: 73
+WAXED_CHISELED_COPPER:
+  r: 184
+  g: 100
+  b: 73
+WAXED_COPPER_BARS:
+  r: 152
+  g: 78
+  b: 52
+WAXED_COPPER_BLOCK:
+  r: 192
+  g: 107
+  b: 79
+WAXED_COPPER_BULB:
+  r: 186
+  g: 118
+  b: 81
+WAXED_COPPER_CHAIN:
+  r: 151
+  g: 79
+  b: 54
+WAXED_COPPER_CHEST:
+  r: 167
+  g: 92
+  b: 68
+WAXED_COPPER_DOOR:
+  r: 187
+  g: 106
+  b: 80
+WAXED_COPPER_GOLEM_STATUE:
+  r: 192
+  g: 107
+  b: 79
+WAXED_COPPER_GRATE:
+  r: 191
+  g: 107
+  b: 79
+WAXED_COPPER_LANTERN:
+  r: 159
+  g: 116
+  b: 81
+WAXED_COPPER_TRAPDOOR:
+  r: 187
+  g: 104
+  b: 77
+WAXED_CUT_COPPER:
+  r: 191
+  g: 106
+  b: 80
+WAXED_CUT_COPPER_SLAB:
+  r: 191
+  g: 106
+  b: 80
+WAXED_CUT_COPPER_STAIRS:
+  r: 191
+  g: 106
+  b: 80
+WAXED_EXPOSED_CHISELED_COPPER:
+  r: 154
+  g: 119
+  b: 100
+WAXED_EXPOSED_COPPER:
+  r: 161
+  g: 125
+  b: 103
+WAXED_EXPOSED_COPPER_BARS:
+  r: 129
+  g: 105
+  b: 87
+WAXED_EXPOSED_COPPER_BULB:
+  r: 165
+  g: 125
+  b: 94
+WAXED_EXPOSED_COPPER_CHAIN:
+  r: 126
+  g: 101
+  b: 83
+WAXED_EXPOSED_COPPER_CHEST:
+  r: 145
+  g: 110
+  b: 94
+WAXED_EXPOSED_COPPER_DOOR:
+  r: 159
+  g: 120
+  b: 103
+WAXED_EXPOSED_COPPER_GOLEM_STATUE:
+  r: 161
+  g: 125
+  b: 103
+WAXED_EXPOSED_COPPER_GRATE:
+  r: 161
+  g: 125
+  b: 104
+WAXED_EXPOSED_COPPER_LANTERN:
+  r: 151
+  g: 138
+  b: 109
+WAXED_EXPOSED_COPPER_TRAPDOOR:
+  r: 157
+  g: 123
+  b: 102
+WAXED_EXPOSED_CUT_COPPER:
+  r: 154
+  g: 121
+  b: 101
+WAXED_EXPOSED_CUT_COPPER_SLAB:
+  r: 154
+  g: 121
+  b: 101
+WAXED_EXPOSED_CUT_COPPER_STAIRS:
+  r: 154
+  g: 121
+  b: 101
+WAXED_EXPOSED_LIGHTNING_ROD:
+  r: 208
+  g: 188
+  b: 180
+WAXED_LIGHTNING_ROD:
+  r: 227
+  g: 183
+  b: 169
+WAXED_OXIDIZED_CHISELED_COPPER:
+  r: 83
+  g: 161
+  b: 132
+WAXED_OXIDIZED_COPPER:
+  r: 82
+  g: 162
+  b: 132
+WAXED_OXIDIZED_COPPER_BARS:
+  r: 63
+  g: 119
+  b: 98
+WAXED_OXIDIZED_COPPER_BULB:
+  r: 103
+  g: 142
+  b: 106
+WAXED_OXIDIZED_COPPER_CHAIN:
+  r: 61
+  g: 118
+  b: 99
+WAXED_OXIDIZED_COPPER_CHEST:
+  r: 72
+  g: 140
+  b: 116
+WAXED_OXIDIZED_COPPER_DOOR:
+  r: 81
+  g: 156
+  b: 129
+WAXED_OXIDIZED_COPPER_GOLEM_STATUE:
+  r: 82
+  g: 162
+  b: 132
+WAXED_OXIDIZED_COPPER_GRATE:
+  r: 82
+  g: 161
+  b: 131
+WAXED_OXIDIZED_COPPER_LANTERN:
+  r: 83
+  g: 145
+  b: 115
+WAXED_OXIDIZED_COPPER_TRAPDOOR:
+  r: 80
+  g: 156
+  b: 128
+WAXED_OXIDIZED_CUT_COPPER:
+  r: 79
+  g: 153
+  b: 126
+WAXED_OXIDIZED_CUT_COPPER_SLAB:
+  r: 79
+  g: 153
+  b: 126
+WAXED_OXIDIZED_CUT_COPPER_STAIRS:
+  r: 79
+  g: 153
+  b: 126
+WAXED_OXIDIZED_LIGHTNING_ROD:
+  r: 168
+  g: 206
+  b: 192
+WAXED_WEATHERED_CHISELED_COPPER:
+  r: 104
+  g: 150
+  b: 111
+WAXED_WEATHERED_COPPER:
+  r: 108
+  g: 153
+  b: 110
+WAXED_WEATHERED_COPPER_BARS:
+  r: 81
+  g: 119
+  b: 93
+WAXED_WEATHERED_COPPER_BULB:
+  r: 125
+  g: 141
+  b: 98
+WAXED_WEATHERED_COPPER_CHAIN:
+  r: 72
+  g: 108
+  b: 91
+WAXED_WEATHERED_COPPER_CHEST:
+  r: 96
+  g: 132
+  b: 95
+WAXED_WEATHERED_COPPER_DOOR:
+  r: 108
+  g: 147
+  b: 106
+WAXED_WEATHERED_COPPER_GOLEM_STATUE:
+  r: 108
+  g: 153
+  b: 110
+WAXED_WEATHERED_COPPER_GRATE:
+  r: 106
+  g: 152
+  b: 110
+WAXED_WEATHERED_COPPER_LANTERN:
+  r: 100
+  g: 139
+  b: 102
+WAXED_WEATHERED_COPPER_TRAPDOOR:
+  r: 107
+  g: 149
+  b: 107
+WAXED_WEATHERED_CUT_COPPER:
+  r: 109
+  g: 145
+  b: 107
+WAXED_WEATHERED_CUT_COPPER_SLAB:
+  r: 109
+  g: 145
+  b: 107
+WAXED_WEATHERED_CUT_COPPER_STAIRS:
+  r: 109
+  g: 145
+  b: 107
+WAXED_WEATHERED_LIGHTNING_ROD:
+  r: 177
+  g: 200
+  b: 181
+WEATHERED_CHISELED_COPPER:
+  r: 104
+  g: 150
+  b: 111
+WEATHERED_COPPER:
+  r: 108
+  g: 153
+  b: 110
+WEATHERED_COPPER_BARS:
+  r: 81
+  g: 119
+  b: 93
+WEATHERED_COPPER_BULB:
+  r: 125
+  g: 141
+  b: 98
+WEATHERED_COPPER_CHAIN:
+  r: 72
+  g: 108
+  b: 91
+WEATHERED_COPPER_CHEST:
+  r: 96
+  g: 132
+  b: 95
+WEATHERED_COPPER_DOOR:
+  r: 108
+  g: 147
+  b: 106
+WEATHERED_COPPER_GOLEM_STATUE:
+  r: 108
+  g: 153
+  b: 110
+WEATHERED_COPPER_GRATE:
+  r: 106
+  g: 152
+  b: 110
+WEATHERED_COPPER_LANTERN:
+  r: 100
+  g: 139
+  b: 102
+WEATHERED_COPPER_TRAPDOOR:
+  r: 107
+  g: 149
+  b: 107
+WEATHERED_CUT_COPPER:
+  r: 109
+  g: 145
+  b: 107
+WEATHERED_CUT_COPPER_SLAB:
+  r: 109
+  g: 145
+  b: 107
+WEATHERED_CUT_COPPER_STAIRS:
+  r: 109
+  g: 145
+  b: 107
+WEATHERED_LIGHTNING_ROD:
+  r: 177
+  g: 200
+  b: 181
+WEEPING_VINES:
+  r: 104
+  g: 1
+  b: 0
+WEEPING_VINES_PLANT:
+  r: 132
+  g: 16
+  b: 12
+WET_SPONGE:
+  r: 171
+  g: 181
+  b: 70
+WHEAT:
+  r: 55
+  g: 133
+  b: 24
+WHITE_BED:
+  r: 185
+  g: 172
+  b: 147
+WHITE_CANDLE:
+  r: 214
+  g: 216
+  b: 213
+WHITE_CANDLE_CAKE:
+  r: 198
+  g: 152
+  b: 128
+WHITE_CARPET:
+  r: 233
+  g: 236
+  b: 236
+WHITE_CONCRETE:
+  r: 207
+  g: 213
+  b: 214
+WHITE_CONCRETE_POWDER:
+  r: 225
+  g: 227
+  b: 227
+WHITE_CONCRETE_SLAB:
+  r: 207
+  g: 213
+  b: 214
+WHITE_CONCRETE_STAIRS:
+  r: 207
+  g: 213
+  b: 214
+WHITE_GLAZED_TERRACOTTA:
+  r: 188
+  g: 212
+  b: 202
+WHITE_SHULKER_BOX:
+  r: 200
+  g: 205
+  b: 198
+WHITE_STAINED_GLASS:
+  r: 255
+  g: 255
+  b: 255
+WHITE_STAINED_GLASS_PANE:
+  r: 251
+  g: 251
+  b: 251
+WHITE_TERRACOTTA:
+  r: 209
+  g: 178
+  b: 161
+WHITE_TULIP:
+  r: 93
+  g: 164
+  b: 71
+WHITE_WOOL:
+  r: 233
+  g: 236
+  b: 236
+WHITE_WOOL_SLAB:
+  r: 233
+  g: 236
+  b: 236
+WHITE_WOOL_STAIRS:
+  r: 233
+  g: 236
+  b: 236
+WILDFLOWERS:
+  r: 218
+  g: 204
+  b: 138
+WITHER_ROSE:
+  r: 41
+  g: 44
+  b: 23
+WITHER_SKELETON_SKULL:
+  r: 44
+  g: 45
+  b: 45
+WITHER_SKELETON_WALL_SKULL:
+  r: 44
+  g: 45
+  b: 45
+YELLOW_BED:
+  r: 193
+  g: 157
+  b: 76
+YELLOW_CANDLE:
+  r: 213
+  g: 173
+  b: 62
+YELLOW_CANDLE_CAKE:
+  r: 198
+  g: 149
+  b: 118
+YELLOW_CARPET:
+  r: 248
+  g: 197
+  b: 39
+YELLOW_CONCRETE:
+  r: 240
+  g: 175
+  b: 21
+YELLOW_CONCRETE_POWDER:
+  r: 232
+  g: 199
+  b: 54
+YELLOW_CONCRETE_SLAB:
+  r: 240
+  g: 175
+  b: 21
+YELLOW_CONCRETE_STAIRS:
+  r: 240
+  g: 175
+  b: 21
+YELLOW_GLAZED_TERRACOTTA:
+  r: 234
+  g: 192
+  b: 88
+YELLOW_POPLAR_LEAVES:
+  r: 214
+  g: 133
+  b: 40
+YELLOW_SHULKER_BOX:
+  r: 233
+  g: 180
+  b: 39
+YELLOW_STAINED_GLASS:
+  r: 229
+  g: 229
+  b: 51
+YELLOW_STAINED_GLASS_PANE:
+  r: 225
+  g: 225
+  b: 50
+YELLOW_TERRACOTTA:
+  r: 186
+  g: 133
+  b: 35
+YELLOW_WOOL:
+  r: 248
+  g: 197
+  b: 39
+YELLOW_WOOL_SLAB:
+  r: 248
+  g: 197
+  b: 39
+YELLOW_WOOL_STAIRS:
+  r: 248
+  g: 197
+  b: 39
+ZOMBIE_HEAD:
+  r: 77
+  g: 111
+  b: 60
+ZOMBIE_WALL_HEAD:
+  r: 77
+  g: 111
+  b: 60

@@ -1,0 +1,12 @@
+# Famara 在 CraftEngine 物品菜单中的独立分类
+categories:
+  famara:famara:
+    priority: 10
+    name: "<!i><blue><b>Famara</b></blue><white> 相机</white>"
+    lore:
+      - "<!i><gray>撕拉片相机与胶卷</gray>"
+    icon: famara:camera
+    list:
+      - famara:camera
+      - famara:film_box
+      - famara:photo

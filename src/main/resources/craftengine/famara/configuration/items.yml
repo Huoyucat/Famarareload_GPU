@@ -1,0 +1,42 @@
+# Famara 的自定义物品。插件启动时会把本目录覆盖写入 CraftEngine/resources/famara，
+# 如需自定义请修改插件 jar 内的源文件，否则重启后会被还原。
+items:
+  famara:camera:
+    material: stick
+    data:
+      item_name: "<!i><white>相机"
+    # custom_model_data 的第 0 个 flag 表示取景器是否打开，由插件在运行时切换
+    model:
+      type: minecraft:condition
+      property: minecraft:custom_model_data
+      index: 0
+      on_true:
+        # 取景时不向第一人称渲染管线提交近视点模型，避免光影对半透明叠层的异常处理。
+        type: minecraft:select
+        property: minecraft:display_context
+        cases:
+          - when:
+              - firstperson_righthand
+              - firstperson_lefthand
+            model:
+              type: minecraft:empty
+        fallback:
+          type: minecraft:model
+          path: famara:item/famara_open
+      on_false:
+        type: minecraft:model
+        path: famara:item/famara_close
+  famara:film_box:
+    material: paper
+    data:
+      item_name: "<!i><white>胶卷盒"
+    model:
+      type: minecraft:model
+      path: famara:item/film_box
+  famara:photo:
+    material: filled_map
+    data:
+      item_name: "<!i><white>照片"
+    model:
+      type: minecraft:model
+      path: famara:item/photo

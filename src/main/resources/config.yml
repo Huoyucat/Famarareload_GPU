@@ -1,0 +1,5 @@
+version: 5
+# 拍照时光线追踪的最远距离（格），范围 16 ~ 256
+render-distance: 256
+# 取景器相对旧版的额外放大强度，0 为不放大，1 为旧版，默认减半；不改变照片视野
+viewfinder-zoom-strength: 0.5

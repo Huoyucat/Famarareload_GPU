@@ -1,0 +1,5 @@
+author: wenkrang
+version: 1.5
+description: Famara camera items
+namespace: famara
+enable: true
