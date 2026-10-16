@@ -74,13 +74,7 @@ Famara 是一台属于 Minecraft 服务器的「撕拉片相机」。它保留�
 
 ![分割线.png](img/分割线.png)
 
-## 特别感谢
 
-- 来自粘液科技（Slimefun）的多方块结构与配方界面灵感
-- exposure mod 的玩法启发
-- Cup0fCode/Cameras 插件的向量算法借鉴
-- 来自通义千问大模型的帮助，通义千问能帮助开发者快速完成开发
-- bukkit.windit.net 中文 Spigot API 文档
 
 ## 感谢有你
 
