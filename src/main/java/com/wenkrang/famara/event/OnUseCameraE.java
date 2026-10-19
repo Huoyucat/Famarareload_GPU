@@ -50,6 +50,7 @@ public class OnUseCameraE implements Listener {
                 (event.getAction().equals(Action.RIGHT_CLICK_AIR) ||
                         event.getAction().equals(Action.RIGHT_CLICK_BLOCK))) {
             if (event.getPlayer().getInventory().getItemInMainHand().getItemMeta() == null) return;
+            if(com.wenkrang.famara.render.platform.PhotoRuntime.interact(event))return;
             // 从 CraftEngine 菜单获取的相机缺少名称与描述，先补全
             ItemStack held = event.getPlayer().getInventory().getItemInMainHand();
             ItemStack normalized = ItemUtils.normalizeCamera(held);
@@ -79,6 +80,7 @@ public class OnUseCameraE implements Listener {
                 MapMeta mapMeta = (MapMeta) itemStack.getItemMeta();
                 int mapId = mapMeta.getMapId();
                 ItemStack cameraFilmed = ItemSystem.get("camera_filmed");
+                com.wenkrang.famara.render.platform.CameraIdentity.copy(itemInMainHand,cameraFilmed,false);
                 List<String> lore = cameraFilmed.getItemMeta().getLore();
                 lore.set(3, "§7照片编号：" + mapId);
                 ItemMeta itemMeta = cameraFilmed.getItemMeta();
@@ -118,6 +120,7 @@ public class OnUseCameraE implements Listener {
                     }
 
                     ItemStack itemStack1 = ItemSystem.get("camera");
+                    com.wenkrang.famara.render.platform.CameraIdentity.copy(event.getPlayer().getInventory().getItemInMainHand(),itemStack1,false);
                     ItemStack itemStack2 = ItemUtils.setFilmAmount(itemStack1, ItemUtils.getFilmAmount(event.getPlayer().getInventory().getItemInMainHand()));
                     event.getPlayer().getInventory().setItemInMainHand(itemStack2);
                 } catch (Exception e) {
@@ -141,7 +144,7 @@ public class OnUseCameraE implements Listener {
                     }else {
                         if (Bukkit.getMap(i) == null) return;
                         MapView map = null;
-                        File pictureFile = new File(plugin.getDataFolder(), "pictures/" + i + ".png");
+                        File pictureFile = new File(com.wenkrang.famara.lib.DataFolders.of(plugin), "pictures/" + i + ".png");
                         if (pictureFile.exists()) {
                             if (Bukkit.getMap(i) == null) {
                                 if (pictureFile.exists()) {

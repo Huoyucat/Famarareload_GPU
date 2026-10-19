@@ -1,11 +1,12 @@
-name: Famarareload
+name: FamaraV2
 version: '${project.version}'
+provides: [Famarareload, Famara]
 main: com.wenkrang.famara.BootLoader
 api-version: '1.20'
 folia-supported: true
 softdepend: [CraftEngine]
 commands:
   fa:
-      description: Famarareload
+      description: FamaraV2
       usage: /fa
       aliases: [famara]

@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 
 /** 用户覆盖、内置颜色和原版状态地图色的统一解析入口。 */
 public final class ColorManager {
-    private static final Logger LOG = Logger.getLogger("Famara");
+    private static final Logger LOG = Logger.getLogger("FamaraV2");
     private static final Map<String, String> ALIASES = Map.of(
             "DARGON_HEAD", "DRAGON_HEAD", "COBBLESOTNE_STAIRS", "COBBLESTONE_STAIRS",
             "BLACK_STATINED_GLASS_PANE", "BLACK_STAINED_GLASS_PANE",

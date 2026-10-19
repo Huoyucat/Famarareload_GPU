@@ -32,13 +32,13 @@ public final class CompatibilityReport {
         lines.add("目标：Paper/Folia 1.20.x–26.x 中实际存在的发行版；未来 26.x 需要重新核对");
         lines.add("当前构建 API：Paper 1.20.1；字节码：Java 21；可选 CE API 编译基线：26.9.2");
         lines.add(CeCompat.enabled() ? "使用 CE 生成包；未自动处理 ViaVersion 跨协议资源分发。"
-                : "独立可选包：plugins/Famarareload/famara-standalone.zip；未加载仅显示原版外观。");
+                : "独立可选包：实际数据目录/famara-standalone.zip；未加载仅显示原版外观。");
         try {
-            Path output = plugin.getDataFolder().toPath().resolve("compatibility.txt");
+            Path output = com.wenkrang.famara.lib.DataFolders.of(plugin).toPath().resolve("compatibility.txt");
             Files.createDirectories(output.toAbsolutePath().getParent());
             Files.writeString(output, String.join(System.lineSeparator(), lines), StandardCharsets.UTF_8);
-            Logger.getLogger("Famara").info("兼容分支：" + Sched.mode() + "，物品模型="
+            Logger.getLogger("FamaraV2").info("兼容分支：" + Sched.mode() + "，物品模型="
                     + (RuntimeCompat.modernItemModels() ? "modern" : "legacy") + "；详情见 compatibility.txt");
-        } catch (Exception e) { Logger.getLogger("Famara").warning("写入兼容报告失败：" + e.getMessage()); }
+        } catch (Exception e) { Logger.getLogger("FamaraV2").warning("写入兼容报告失败：" + e.getMessage()); }
     }
 }

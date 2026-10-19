@@ -3,6 +3,8 @@ package com.wenkrang.famara.compat;
 import com.wenkrang.famara.lib.ColorManager;
 import com.wenkrang.famara.render.lib.EntityShape;
 import com.wenkrang.famara.render.lib.FaColor;
+import com.wenkrang.famara.render.asset.*;
+import java.util.concurrent.atomic.AtomicLong;
 import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Entity;
@@ -22,11 +24,45 @@ import java.util.logging.Logger;
 public final class CeCompat {
     public static final int NOT_CUSTOM = Integer.MIN_VALUE;
     public static final int NO_COLOR = Integer.MIN_VALUE + 1;
-    private static final Logger LOG = Logger.getLogger("Famara");
+    private static final Logger LOG = Logger.getLogger("FamaraV2");
     public record ItemModel(String resource, PackColorIndex.ItemState state) {}
     public record BlockColor(int rgb, String id) {}
+    public record VisualState(String serverState,String material,String id,String vanillaState,String visualState,boolean customBlock) {
+        public VisualState(String serverState,String material,String id,String vanillaState,String visualState){this(serverState,material,id,vanillaState,visualState,true);}
+    }
+    public interface VisualCursor {
+        List<VisualState> next(int maximum);
+        boolean done();
+    }
+    public record VisualSources(long epoch,boolean cePresent,boolean adapterAvailable,List<Path> paths) {
+        public VisualSources {paths=List.copyOf(paths);}
+    }
+    private static final Object VISUAL_LOCK=new Object();
+    private static final AtomicLong VISUAL_EPOCH=new AtomicLong(1);
+    private static volatile boolean cePresent;
+    public static long visualEpoch(){return VISUAL_EPOCH.get();}
+    public static void invalidateVisualResources(){VISUAL_EPOCH.incrementAndGet();}
+    public static VisualSources visualSources() {
+        synchronized(VISUAL_LOCK) {
+            return new VisualSources(visualEpoch(),cePresent,backend.enabled(),CeColorService.persistentCandidates());
+        }
+    }
+    public static VisualCursor openVisualCursor(long expectedEpoch) {
+        Backend provider=backend;
+        if(expectedEpoch!=visualEpoch())throw new IllegalStateException("CE资源正在重载");
+        if(!cePresent)return new VisualCursor(){public List<VisualState> next(int n){return List.of();}public boolean done(){return true;}};
+        if(!provider.enabled() || provider.reloading())throw new IllegalStateException("CE视觉接口不可用或正在重载");
+        VisualCursor cursor=provider.visualCursor();
+        return new VisualCursor() {
+            private void check(){if(expectedEpoch!=visualEpoch() || !provider.enabled() || provider.reloading())throw new IllegalStateException("CE视觉状态在采集期间改变");}
+            public List<VisualState> next(int n){check();List<VisualState> value=List.copyOf(cursor.next(n));check();return value;}
+            public boolean done(){check();return cursor.done();}
+        };
+    }
     public interface Backend {
         default boolean enabled() { return false; }
+        default boolean reloading(){return false;}
+        default VisualCursor visualCursor(){throw new UnsupportedOperationException("此CE后端缺少V2视觉注册表能力");}
         default ItemStack buildItem(String id) { return null; }
         default boolean matches(ItemStack stack, String id) { return false; }
         default BlockColor block(BlockData data, Session session) { return new BlockColor(NOT_CUSTOM, null); }
@@ -47,6 +83,7 @@ public final class CeCompat {
     public static void initialize(Plugin plugin) {
         owner = plugin;
         Plugin ce = plugin.getServer().getPluginManager().getPlugin("CraftEngine");
+        cePresent=ce!=null;invalidateVisualResources();
         if (ce == null || !ce.isEnabled()) {
             backend = NONE;
             status = ce == null ? "未安装 CraftEngine，使用独立模式" : "CraftEngine 未启用，使用独立模式";
@@ -75,9 +112,10 @@ public final class CeCompat {
     }
     public static boolean enabled() { return backend.enabled(); }
     public static String status() { return status; }
-    static void backendForTests(Backend value) { backend = value == null ? NONE : value; }
+    static void backendForTests(Backend value) { backend=value==null?NONE:value;cePresent=value!=null;invalidateVisualResources(); }
     private static synchronized void disable(Throwable error) {
         if (backend == NONE) return;
+        invalidateVisualResources();
         Backend previous = backend;
         backend = NONE;
         try { previous.close(); }
@@ -116,22 +154,36 @@ public final class CeCompat {
     }
     public static void refreshResources(Path report) {
         if (!enabled()) return;
-        try { backend.refreshResources(report); }
+        try { synchronized(VISUAL_LOCK){invalidateVisualResources();try{backend.refreshResources(report);}finally{invalidateVisualResources();}} }
         catch (RuntimeException | LinkageError error) { disable(error); }
     }
     public static void refreshItemModels() {
         if (!enabled()) return;
-        try { backend.refreshItemModels(); }
+        try {
+            synchronized(VISUAL_LOCK){invalidateVisualResources();try{backend.refreshItemModels();}finally{invalidateVisualResources();}}
+            Plugin plugin=owner;
+            if(plugin!=null && plugin.isEnabled())scheduleRebuild(requestRebuild());
+        }
         catch (RuntimeException | LinkageError error) { disable(error); }
     }
+    public static void unavailable() {
+        synchronized(VISUAL_LOCK) {
+            invalidateVisualResources();CeColorService.request();Backend previous=backend;backend=NONE;cePresent=true;
+            try{previous.close();}catch(RuntimeException | LinkageError error){LOG.warning("清理已停用CE兼容失败："+error);}
+            status="CraftEngine已停用，V2拒绝按原版载体继续拍摄";
+        }
+    }
     public static void close() {
+        CeColorService.closeQueue();invalidateVisualResources();
         Backend previous = backend; backend = NONE; owner = null;
         try { previous.close(); }
         catch (RuntimeException | LinkageError error) { LOG.warning("关闭 CE 可选兼容失败：" + error); }
     }
 
     /** 仅含通用类型，无 CE 也能创建场景快照。 */
-    public static final class Session {
+    public static final class Session implements AutoCloseable {
+        private AutoCloseable memory;
+        public void close(){if(memory!=null)try{memory.close();}catch(Exception error){throw new IllegalStateException(error);}memory=null;definitions.clear();blocks.clear();}
         public final ColorManager.View palette;
         final PackColorIndex.Result textures;
         final Map<String, ItemModel> models;
@@ -139,11 +191,17 @@ public final class CeCompat {
         final ConcurrentHashMap<String, Optional<Integer>> definitions = new ConcurrentHashMap<>();
         private final ConcurrentHashMap<BlockData, BlockColor> blocks = new ConcurrentHashMap<>();
         private final Backend provider;
+        final boolean frozen;
+        final long visualEpoch;
         public Session(ColorManager.View palette, PackColorIndex.Result textures) {
             this(palette, new CeColorService.Snapshot(textures, List.of(), List.of(), Map.of()));
         }
         Session(ColorManager.View palette, CeColorService.Snapshot snapshot) {
-            this.palette = palette; this.snapshot = snapshot; this.textures = snapshot.result;
+            this(palette,snapshot,false,0);
+        }
+        private Session(ColorManager.View palette,CeColorService.Snapshot snapshot,boolean frozen,long epoch) {
+            this.frozen=frozen;visualEpoch=epoch;
+            this.palette = palette; this.snapshot = snapshot;memory=snapshot.memory==null?null:snapshot.memory.retain(); this.textures = snapshot.result;
             this.models = snapshot.models; this.provider = backend;
         }
         public BlockColor block(BlockData data) {
@@ -160,21 +218,42 @@ public final class CeCompat {
         }
     }
     public static Session session() { return new Session(ColorManager.view(), CeColorService.snapshot()); }
+    public static Session frozenSession(long epoch) {
+        if(epoch!=visualEpoch())throw new IllegalStateException("CE视觉代已变化");
+        CeColorService.Snapshot snapshot=CeColorService.snapshot();
+        if(cePresent && (!enabled() || snapshot.visualEpoch!=epoch))throw new IllegalStateException("同代CE家具颜色索引尚未就绪");
+        return new Session(ColorManager.view(),snapshot,true,epoch);
+    }
+    public static EntityShape captureFrozen(Entity entity,Session session,Set<UUID> seen) {
+        if(!session.frozen)throw new IllegalArgumentException("需要冻结的CE会话");
+        if(session.visualEpoch!=visualEpoch())throw new IllegalStateException("CE在实体采集期间变化");
+        if(!cePresent)return null;
+        if(!session.provider.enabled() || session.provider.reloading())throw new IllegalStateException("CE正在停用或重载");
+        EntityShape result=session.provider.capture(entity,session,seen);
+        if(session.visualEpoch!=visualEpoch())throw new IllegalStateException("CE在实体采集期间变化");
+        return result;
+    }
     public static EntityShape capture(Entity entity, Session session, Set<UUID> seen) {
         if (!enabled() || !session.provider.enabled()) return null;
         try { return session.provider.capture(entity, session, seen); }
         catch (LinkageError error) { disable(error); return null; }
     }
     public static File defaultPackZip() { return new File(Bukkit.getPluginsFolder(), "CraftEngine/generated/resource_pack.zip"); }
+    /** 旧色暂用自己的280MiB有界账本；该参数仅为旧调用方兼容，不转借V2共享预算。 */
+    public static void memoryBudget(com.wenkrang.famara.render.schedule.RenderMemoryBudget memory){CeColorService.memory(memory);}
+    public static void loadingBudget(com.wenkrang.famara.render.schedule.CpuBudget budget,com.wenkrang.famara.render.schedule.BudgetedAssetLoader.Limits limits){CeColorService.performance(budget,limits);}
+    public static boolean colorsReady(long epoch){return !cePresent || CeColorService.ready(epoch);}
+    public static String colorsFailure(long epoch){return cePresent?CeColorService.failure(epoch):null;}
+    public static void scheduleRebuild(long ticket){if(enabled())CeColorService.schedule(ticket);}
     public static long requestRebuild() { return CeColorService.request(); }
     public static void rebuildFromZip(File zip) { rebuildFromZip(zip, requestRebuild()); }
-    public static void rebuildFromZip(File zip, long ticket) { CeColorService.rebuild(zip == null ? List.of() : List.of(zip.toPath()), ticket); }
+    public static void rebuildFromZip(File zip, long ticket) { if(enabled())CeColorService.schedule(zip == null ? List.of() : List.of(zip.toPath()), ticket); }
     public static void rebuildFromFolder(Path folder) { rebuildFromFolder(folder, requestRebuild()); }
-    public static void rebuildFromFolder(Path folder, long ticket) { CeColorService.rebuild(folder == null ? List.of() : List.of(folder), ticket); }
-    public static void rebuildLast(long ticket) { if (enabled()) CeColorService.rebuild(ticket); }
+    public static void rebuildFromFolder(Path folder, long ticket) { if(enabled())CeColorService.schedule(folder == null ? List.of() : List.of(folder), ticket); }
+    public static void rebuildLast(long ticket) { if (enabled()) CeColorService.schedule(ticket); }
     static boolean publish(PackColorIndex.Result result, long ticket) { return CeColorService.publish(result, ticket, List.of(), List.of()); }
-    public static long generatedSources(Path folder, Path zip) { return CeColorService.generated(folder, zip); }
-    public static void externalSources(Collection<Path> folders, Collection<Path> zips) { CeColorService.external(folders, zips); }
+    public static long generatedSources(Path folder,Path zip) {synchronized(VISUAL_LOCK){invalidateVisualResources();try{return CeColorService.generated(folder,zip);}finally{invalidateVisualResources();}}}
+    public static void externalSources(Collection<Path> folders,Collection<Path> zips) {synchronized(VISUAL_LOCK){invalidateVisualResources();try{CeColorService.external(folders,zips);}finally{invalidateVisualResources();}}}
     public static void writeDiagnostics(Session session) { CeColorService.writeDiagnostics(session.snapshot); }
 
     static BlockColor resolvePalette(String id, String visual, String itemId, Integer fallback, Session session) {

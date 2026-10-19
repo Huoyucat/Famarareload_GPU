@@ -129,7 +129,7 @@ public class WorldSnapshot {
                 EntityShape shape = CeCompat.capture(entity, colors, furnitureSeen);
                 if (shape != null) shapes.add(shape);
             } catch (RuntimeException e) {
-                java.util.logging.Logger.getLogger("Famara").warning("CE 内容采集失败：" + entity.getUniqueId() + "：" + e.getMessage());
+                java.util.logging.Logger.getLogger("FamaraV2").warning("CE 内容采集失败：" + entity.getUniqueId() + "：" + e.getMessage());
             }
         }
         // 超时或完成后不再接受迟到快照，避免渲染期间内容改变。
@@ -158,7 +158,7 @@ public class WorldSnapshot {
         chunks.clear();
         collectedShapes.clear();
         entities = List.of();
-        furnitureSeen.clear();
+        furnitureSeen.clear();colors.close();
     }
 
     public Collection<EntityShape> entities() { return entities; }

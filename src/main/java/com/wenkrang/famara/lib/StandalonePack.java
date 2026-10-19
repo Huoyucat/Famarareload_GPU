@@ -19,13 +19,13 @@ import java.util.zip.ZipOutputStream;
 public final class StandalonePack {
     public static final String FILE_NAME = "famara-standalone.zip";
     private static final String PREFIX = "craftengine/famara/resourcepack/";
-    private static final Logger LOG = Logger.getLogger("Famara");
+    private static final Logger LOG = Logger.getLogger("FamaraV2");
     private StandalonePack() {}
 
     public static void export(Plugin plugin) {
         Path temporary = null;
         try {
-            Path directory = plugin.getDataFolder().toPath();
+            Path directory = com.wenkrang.famara.lib.DataFolders.of(plugin).toPath();
             Files.createDirectories(directory);
             temporary = Files.createTempFile(directory, "famara-pack-", ".tmp");
             File source = new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI());
@@ -117,26 +117,32 @@ public final class StandalonePack {
         json(output, "assets/minecraft/models/item/" + material + ".json", base);
     }
 
-    private record Format(int major, int minor) {}
+    private record Format(int major,int minor) {}
     private static Format format() {
-        // Minecraft 自身的版本元数据优先，不把开发机客户端路径当运行依赖。
-        try (InputStream input = Bukkit.getServer().getClass().getClassLoader().getResourceAsStream("version.json")) {
-            if (input != null) {
-                JsonObject version = JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
-                JsonElement value = version.getAsJsonObject("pack_version").get("resource");
-                if (value.isJsonArray()) return new Format(value.getAsJsonArray().get(0).getAsInt(), value.getAsJsonArray().get(1).getAsInt());
-                if (value.isJsonObject()) return new Format(value.getAsJsonObject().get("major").getAsInt(), value.getAsJsonObject().get("minor").getAsInt());
-                return new Format(value.getAsInt(), 0);
+        try(InputStream input=Bukkit.getServer().getClass().getClassLoader().getResourceAsStream("version.json")) {
+            if(input!=null) {
+                JsonObject version=JsonParser.parseReader(new InputStreamReader(input,StandardCharsets.UTF_8)).getAsJsonObject();
+                JsonObject formats=version.getAsJsonObject("pack_version");
+                if(formats.has("resource_major"))return new Format(formats.get("resource_major").getAsInt(),formats.get("resource_minor").getAsInt());
+                JsonElement value=formats.get("resource");
+                if(value.isJsonArray())return new Format(value.getAsJsonArray().get(0).getAsInt(),value.getAsJsonArray().get(1).getAsInt());
+                if(value.isJsonObject())return new Format(value.getAsJsonObject().get("major").getAsInt(),value.getAsJsonObject().get("minor").getAsInt());
+                return new Format(value.getAsInt(),0);
             }
-        } catch (Exception ignored) { }
-        String version = Bukkit.getBukkitVersion().split("-")[0];
-        String[] parts = version.split("\\.");
-        if (parts.length >= 2 && parts[0].equals("1")) {
-            int minor = Integer.parseInt(parts[1]), patch = parts.length >= 3 ? Integer.parseInt(parts[2]) : 0;
-            if (minor == 20) return new Format(patch <= 1 ? 15 : patch == 2 ? 18 : patch <= 4 ? 22 : 32, 0);
-            if (minor == 21) return new Format(patch <= 1 ? 34 : patch <= 3 ? 42 : patch == 4 ? 46 : patch == 5 ? 55 : patch == 6 ? 63 : patch <= 8 ? 64 : patch <= 10 ? 69 : 75, 0);
+        }catch(Exception ignored){}
+        String minecraftVersion=Bukkit.getMinecraftVersion();Format modern=formatForMinecraftVersion(minecraftVersion);if(modern!=null)return modern;
+        String version=Bukkit.getBukkitVersion().split("-")[0];String[] parts=version.split("\\.");
+        if(parts.length>=2 && parts[0].equals("1")) {
+            int minor=Integer.parseInt(parts[1]),patch=parts.length>=3?Integer.parseInt(parts[2]):0;
+            if(minor==20)return new Format(patch<=1?15:patch==2?18:patch<=4?22:32,0);
+            if(minor==21)return new Format(patch<=1?34:patch<=3?42:patch==4?46:patch==5?55:patch==6?63:patch<=8?64:patch<=10?69:75,0);
         }
-        LOG.warning("无法读取客户端资源格式版本；独立包暂用兼容格式 15，请按实际客户端调整 pack.mcmeta。");
-        return new Format(15, 0);
+        LOG.warning("无法读取客户端资源格式版本；服务器版本="+minecraftVersion+"，独立包暂用兼容格式15。V2基础资源不受此独立物品包格式推断影响。");return new Format(15,0);
+    }
+    static Format formatForMinecraftVersion(String version) {
+        if(version==null)return null;
+        var match=java.util.regex.Pattern.compile("26[.]([123])(?:[.]([0-9]+))?(?:[-+].*)?").matcher(version);if(!match.matches())return null;
+        int patch=match.group(2)==null?0:Integer.parseInt(match.group(2));if(patch>(match.group(1).equals("1")?2:0))return null;
+        return switch(match.group(1)){case "1"->new Format(84,0);case "2"->new Format(88,0);default->new Format(97,1);};
     }
 }

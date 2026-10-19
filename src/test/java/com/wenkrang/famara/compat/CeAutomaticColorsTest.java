@@ -19,7 +19,7 @@ class CeAutomaticColorsTest {
     @TempDir Path root;
 
     @BeforeEach void resetSources() {
-        CeColorService.configure(List.of(), List.of(), path -> null);
+        CeColorService.closeQueue();CeColorService.configure(List.of(), List.of(), path -> null);
         CeColorService.external(List.of(), List.of());
         CeColorService.generated(null, null);
         CeColorService.models(Map.of());
@@ -202,4 +202,38 @@ class CeAutomaticColorsTest {
         }
     }
 
+
+    @Test void stagedItemMappingsDoNotMutateAnAlreadyPublishedColorSnapshot() {
+        assertTrue(CeCompat.publish(valid(0x113355),CeCompat.requestRebuild()));var old=CeColorService.snapshot();
+        CeColorService.models(Map.of("test:next",new CeCompat.ItemModel("test:changed",PackColorIndex.ItemState.EMPTY)));
+        assertSame(old,CeColorService.snapshot());assertFalse(old.models.containsKey("test:next"));
+        assertTrue(CeCompat.publish(valid(0x224466),CeCompat.requestRebuild()));
+        assertEquals("test:changed",CeColorService.snapshot().models.get("test:next").resource());
+        assertNotSame(old,CeColorService.snapshot());
+    }
+
+
+
+
+
+
+
+
+
+    @Test void v2SourcesKeepPersistentZipPriorityButDoNotRetainEventOwnedFilesystems()throws Exception {
+        Path transientZip=root.resolve("ephemeral.zip"),finalZip=root.resolve("final.zip");Path ephemeral;
+        try(var fs=java.nio.file.FileSystems.newFileSystem(java.net.URI.create("jar:"+transientZip.toUri()),Map.of("create","true"))) {
+            ephemeral=fs.getPath("/generated");Files.createDirectories(ephemeral);CeColorService.generated(ephemeral,finalZip);
+            assertEquals(List.of(finalZip.toAbsolutePath()),CeColorService.persistentCandidates());
+        }
+        assertEquals(List.of(finalZip.toAbsolutePath()),CeColorService.persistentCandidates());
+    }
+    @Test void legacyColorReaderAlsoReleasesOriginalZipDuringItsDecodeLifetime()throws Exception {
+        Path archive=root.resolve("source.zip");zip(archive,Map.of("assets/test/textures/leaf.png",png(0x123456)));
+        try(CePackSources sources=CePackSources.open(List.of(archive))) {
+            Path retired=root.resolve("retired.zip");Files.move(archive,retired);Files.writeString(archive,"new generation");Files.delete(retired);
+            assertNotNull(sources.source().read("assets/test/textures/leaf.png"));assertEquals(List.of(archive.toAbsolutePath()),sources.opened());
+        }
+        assertEquals("new generation",Files.readString(archive));
+    }
 }

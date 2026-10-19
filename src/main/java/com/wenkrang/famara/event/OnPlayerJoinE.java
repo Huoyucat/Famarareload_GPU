@@ -59,7 +59,7 @@ public class OnPlayerJoinE implements Listener {
 
     public static void startCheck(Player player) {
         BossBar progress = Bukkit.createBossBar("冲洗进度", BarColor.WHITE, BarStyle.SOLID);
-        File PlayerFile = new File(plugin.getDataFolder(), "players/" + player.getName() + ".yml");
+        File PlayerFile = new File(com.wenkrang.famara.lib.DataFolders.of(plugin), "players/" + player.getName() + ".yml");
 
         if(!PlayerFile.exists()) {
             try {
@@ -78,7 +78,12 @@ public class OnPlayerJoinE implements Listener {
                 return;
             }
             // 缩放与收镜清理必须先于冲洗进度的提前返回执行。
-            updateCamera(player);
+            try{updateCamera(player);}catch(RuntimeException error){progress.removeAll();return;}
+            var v2=com.wenkrang.famara.render.platform.PhotoRuntime.progress(player.getInventory().getItemInMainHand());
+            if(v2.tracked()) {
+                if(v2.success() || v2.failed()){progress.removeAll();return;}
+                progress.addPlayer(player);progress.setProgress(v2.pixels()/16384.0);progress.setTitle("V2冲洗 "+v2.message());return;
+            }
             if (player.getInventory().getItemInMainHand().getItemMeta() != null) {
                 if (player.getInventory().getItemInMainHand()
                         .getItemMeta()

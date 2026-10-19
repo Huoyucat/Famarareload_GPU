@@ -40,7 +40,7 @@ public final class PackColorIndex {
         Integer color(ItemState state);
         default boolean usable() {
             try { return color(ItemState.EMPTY) != null; }
-            catch (RuntimeException e) { return false; }
+            catch(java.util.concurrent.RejectedExecutionException memory){throw memory;} catch (java.util.concurrent.CancellationException cancelled){throw cancelled;} catch (RuntimeException e) { return false; }
         }
     }
     private static ItemColor compiled(Function<ItemState, Integer> evaluator, boolean usable) {
@@ -99,13 +99,17 @@ public final class PackColorIndex {
     private static final String[] SUFFIXES = {"_top", "_side", "_bottom", "_front", "_end", "_inner", "_outer", "_back"};
     private final PackSource source;
     private final Function<String, Integer> vanilla;
-    private final Map<String, Optional<Integer>> models = new HashMap<>();
-    private final Map<String, Optional<Integer>> textures = new HashMap<>();
-    private final Set<String> issues = new LinkedHashSet<>();
+    private final Map<String, Optional<Integer>> models = new LinkedHashMap<>(16,.75f,true);
+    private final Map<String, Optional<Integer>> textures = new LinkedHashMap<>(16,.75f,true);
+    private final ColorWorkBudget work;
+    private final Set<String> issues;
 
     private PackColorIndex(PackSource source, Function<String, Integer> vanilla) {
-        this.source = source;
-        this.vanilla = vanilla;
+        this(source,vanilla,null);
+    }
+    private PackColorIndex(PackSource source,Function<String,Integer> vanilla,ColorWorkBudget work) {
+        this.source=source;this.vanilla=vanilla;this.work=work;
+        issues=new LinkedHashSet<>(){@Override public boolean add(String value){if(!contains(value) && work!=null)work.retain("issues",128L+value.length()*4L);return super.add(value);}};
     }
 
     public static Result build(PackSource source) throws IOException {
@@ -113,19 +117,43 @@ public final class PackColorIndex {
         return build(source, palette::vanilla);
     }
 
-    public static Result build(PackSource source, Function<String, Integer> vanilla) throws IOException {
-        PackColorIndex parser = new PackColorIndex(source, vanilla);
-        Map<String, ItemColor> items = new HashMap<>();
-        Map<String, ItemColor> legacyItems = new HashMap<>();
-        Map<String, BlockColors> states = new HashMap<>();
-        for (String path : source.list()) {
+    public static Result build(PackSource source,Function<String,Integer> vanilla)throws IOException {
+        Cursor cursor=cursor(source,vanilla);while(!cursor.step(256,Long.MAX_VALUE,System::nanoTime,()->true)){}return cursor.result();
+    }
+    public static Cursor cursor(PackSource source,Function<String,Integer> vanilla)throws IOException{return new Cursor(source,vanilla,null);}
+    static Cursor cursor(PackSource source,Function<String,Integer> vanilla,ColorWorkBudget work)throws IOException{return new Cursor(source,vanilla,work);}
+    public static final class Cursor {
+        private final PackSource source;
+        private final PackColorIndex parser;
+        private final Iterator<String> paths;
+        private final Map<String,ItemColor> items=new HashMap<>(),legacyItems=new HashMap<>();
+        private final Map<String,BlockColors> states=new HashMap<>();
+        private Result result;
+        private boolean failed;
+        private Cursor(PackSource source,Function<String,Integer> vanilla,ColorWorkBudget work)throws IOException {
+            this.source=source;parser=new PackColorIndex(source,vanilla,work);paths=source.list().iterator();
+        }
+        public boolean step(int operations,long deadline,java.util.function.LongSupplier clock,java.util.function.BooleanSupplier current)throws IOException {
+            if(operations<=0 || failed)throw new IllegalStateException("旧色索引游标已失败或步长无效");
+            try {
+                if(result!=null)return true;
+                for(int n=0;n<operations && paths.hasNext() && clock.getAsLong()<deadline;n++) {
+                    if(!current.getAsBoolean())throw new java.util.concurrent.CancellationException("旧色索引输入已过期");
+                    try{read(paths.next());}finally{if(parser.work!=null)parser.work.endItem();}
+                }
+                if(!paths.hasNext()){result=new Result(items,states,new ArrayList<>(parser.issues),legacyItems);if(parser.work!=null){items.clear();states.clear();legacyItems.clear();parser.models.clear();parser.textures.clear();parser.work.drop("model-colors");parser.work.drop("texture-colors");}return true;}
+                return false;
+            } catch(IOException | RuntimeException | Error error){failed=true;throw error;}
+        }
+        private void read(String path)throws IOException {
             Matcher item = ITEM.matcher(path);
             Matcher block = BLOCKSTATE.matcher(path);
             Matcher legacy = LEGACY_ITEM.matcher(path);
-            if (!item.matches() && !block.matches() && !legacy.matches()) continue;
+            if (!item.matches() && !block.matches() && !legacy.matches()) return;
             try {
                 JsonObject json = parser.json(path);
-                if (json == null) continue;
+                if (json == null) return;
+                if(parser.work!=null)parser.work.retain("results",512L+path.length()*4L);
                 if (item.matches()) {
                     ItemColor color = parser.itemNode(json.get("model"), path, 0);
                     items.put(item.group(1) + ":" + item.group(2), color);
@@ -141,6 +169,7 @@ public final class PackColorIndex {
                     List<Rule> multipart = new ArrayList<>();
                     if (json.has("variants")) {
                         for (var entry : json.getAsJsonObject("variants").entrySet()) {
+                            if(parser.work!=null)parser.work.retain("results",1024L+entry.getKey().length()*8L);
                             Integer color = parser.variantColor(entry.getValue());
                             if (color == null) continue;
                             Map<String, String> props = properties(entry.getKey());
@@ -157,9 +186,10 @@ public final class PackColorIndex {
                     if (!variants.isEmpty() || !multipart.isEmpty())
                         states.put(block.group(1) + ":" + block.group(2), new BlockColors(variants, multipart));
                 }
-            } catch (RuntimeException e) { parser.issues.add(path + "：" + e.getMessage()); }
+            } catch(java.util.concurrent.RejectedExecutionException memory){throw memory;} catch(java.util.concurrent.CancellationException cancelled){throw cancelled;} catch (RuntimeException e) { parser.issues.add(path + "：" + e.getMessage()); }
+
         }
-        return new Result(items, states, new ArrayList<>(parser.issues), legacyItems);
+        public Result result(){if(result==null || failed)throw new IllegalStateException("旧色索引尚未就绪");return result;}
     }
 
     public static Map<String, String> properties(String props) {
@@ -180,6 +210,7 @@ public final class PackColorIndex {
     }
 
     private Predicate<Map<String, String>> condition(JsonElement element) {
+        if(work!=null)work.retain("results",256);
         if (element == null) return p -> true;
         JsonObject object = element.getAsJsonObject();
         List<Predicate<Map<String, String>>> checks = new ArrayList<>();
@@ -191,6 +222,7 @@ public final class PackColorIndex {
                         ? p -> children.stream().anyMatch(c -> c.test(p))
                         : p -> children.stream().allMatch(c -> c.test(p)));
             } else {
+                if(work!=null)work.retain("results",256L+(entry.getKey().length()+entry.getValue().getAsString().length())*4L);
                 Map<String, String> required = Map.of(entry.getKey(), entry.getValue().getAsString());
                 checks.add(p -> matches(required, p));
             }
@@ -230,6 +262,7 @@ public final class PackColorIndex {
         record Override(Map<String, Float> predicates, ItemColor model) {}
         List<Override> overrides = new ArrayList<>();
         for (JsonElement entry : definition.getAsJsonArray("overrides")) {
+            if(work!=null)work.retain("results",1024);
             JsonObject object = entry.getAsJsonObject();
             Map<String, Float> predicates = new HashMap<>();
             boolean supported = true;
@@ -266,7 +299,7 @@ public final class PackColorIndex {
 
     private ItemColor itemNode(JsonElement element, String path, int depth) {
         if (element == null || depth > 32 || !element.isJsonObject()) return state -> null;
-        JsonObject node = element.getAsJsonObject();
+        JsonObject node = element.getAsJsonObject();if(work!=null)work.retain("results",512);
         String type = node.has("type") ? node.get("type").getAsString().replace("minecraft:", "") : "model";
         switch (type) {
             case "model": {
@@ -302,11 +335,12 @@ public final class PackColorIndex {
                 int index = node.has("index") ? node.get("index").getAsInt() : 0;
                 Map<String, ItemColor> cases = new HashMap<>();
                 for (JsonElement entry : node.getAsJsonArray("cases")) {
+                    if(work!=null)work.retain("results",512);
                     JsonObject o = entry.getAsJsonObject();
                     ItemColor model = itemNode(o.get("model"), path, depth + 1);
                     JsonElement when = o.get("when");
-                    if (when.isJsonArray()) for (JsonElement value : when.getAsJsonArray()) cases.put(value.getAsString(), model);
-                    else cases.put(when.getAsString(), model);
+                    if (when.isJsonArray()) for (JsonElement value : when.getAsJsonArray()){if(work!=null)work.retain("results",128L+value.getAsString().length()*4L);cases.put(value.getAsString(),model);}
+                    else {if(work!=null)work.retain("results",128L+when.getAsString().length()*4L);cases.put(when.getAsString(),model);}
                 }
                 ItemColor fallback = itemNode(node.get("fallback"), path, depth + 1);
                 return compiled(state -> {
@@ -322,6 +356,7 @@ public final class PackColorIndex {
                 float scale = node.has("scale") ? node.get("scale").getAsFloat() : 1;
                 NavigableMap<Float, ItemColor> ranges = new TreeMap<>();
                 for (JsonElement entry : node.getAsJsonArray("entries")) {
+                    if(work!=null)work.retain("results",512);
                     JsonObject o = entry.getAsJsonObject();
                     ranges.put(o.get("threshold").getAsFloat(), itemNode(o.get("model"), path, depth + 1));
                 }
@@ -344,12 +379,22 @@ public final class PackColorIndex {
 
     private JsonObject json(String path) {
         try {
-            byte[] data = source.read(path);
-            if (data == null) return null;
-            return JsonParser.parseString(new String(data, StandardCharsets.UTF_8)).getAsJsonObject();
-        } catch (Exception e) { issues.add(path + "：" + e.getMessage()); return null; }
+            byte[] data=source.read(path);if(data==null)return null;
+            if(work==null)return JsonParser.parseString(new String(data,StandardCharsets.UTF_8)).getAsJsonObject();
+            long remaining=work.jsonRemaining();if(remaining<=0)throw new java.util.concurrent.RejectedExecutionException("旧取色单根JSON临时树超过12MiB");
+            var limits=new com.wenkrang.famara.render.asset.AssetLimits(1,4194304,134217728,1048576,4096,20000,64,64,200000,64);
+            var pack=com.wenkrang.famara.render.asset.ResourcePack.memory("legacy-color-json",Map.of(path,data),limits);
+            var budget=new com.wenkrang.famara.render.asset.AssetMemoryBudget(remaining);
+            JsonObject object=com.wenkrang.famara.render.asset.BoundedJson.read(pack.require(path),path,limits,budget);work.parsed(budget.reservedBytes());return object;
+        } catch(java.util.concurrent.RejectedExecutionException memory){throw memory;}catch(java.util.concurrent.CancellationException cancelled){throw cancelled;}catch(com.wenkrang.famara.render.asset.AssetException limit){if(limit.code()==com.wenkrang.famara.render.asset.AssetException.Code.LIMIT)throw new java.util.concurrent.RejectedExecutionException("旧取色JSON结构/工作集超限："+path,limit);issues.add(path+"："+limit.getMessage());return null;}catch(Exception error){issues.add(path+"："+error.getMessage());return null;}
     }
 
+    private static BufferedImage boundedImage(byte[] data,ColorWorkBudget memory)throws IOException {
+        try(var input=ImageIO.createImageInputStream(new ByteArrayInputStream(data))) {
+            if(input==null)throw new IOException("旧取色PNG输入无效");var readers=ImageIO.getImageReaders(input);if(!readers.hasNext())throw new IOException("旧取色PNG无解码器");
+            var reader=readers.next();try{reader.setInput(input,true,true);long pixels=(long)reader.getWidth(0)*reader.getHeight(0);if(pixels<=0 || pixels>1048576)throw new IOException("旧取色贴图像素超过有界工作集");if(memory!=null)memory.decoding(reader.getWidth(0),reader.getHeight(0),data.length);return reader.read(0);}finally{reader.dispose();}
+        }
+    }
     private static String[] location(String loc) {
         int i = loc.indexOf(':');
         return i < 0 ? new String[]{"minecraft", loc} : new String[]{loc.substring(0, i), loc.substring(i + 1)};
@@ -407,7 +452,7 @@ public final class PackColorIndex {
             if (loc[0].equals("minecraft")) result = vanillaColor(loc[1]);
         }
         if (result == null) issues.add(model + "：无法解析模型贴图颜色");
-        models.put(model, Optional.ofNullable(result));
+        memo(models,"model-colors",model,result);
         return result;
     }
 
@@ -421,13 +466,22 @@ public final class PackColorIndex {
         try {
             byte[] data = source.read(path);
             supplied = data != null;
-            if (supplied) result = imageColor(ImageIO.read(new ByteArrayInputStream(data)), json(path + ".mcmeta"));
-        } catch (Exception e) { issues.add(path + "：" + e.getMessage()); }
+            if(supplied){JsonObject metadata=json(path+".mcmeta");result=imageColor(boundedImage(data,work),metadata);}
+        } catch(java.util.concurrent.RejectedExecutionException memory){throw memory;} catch(java.util.concurrent.CancellationException cancelled){throw cancelled;} catch (Exception e) { issues.add(path + "：" + e.getMessage()); }
         // 透明自带贴图不是缺失贴图，不能擅自替换为原版颜色。
         if (result == null && !supplied && loc[0].equals("minecraft")) result = vanillaColor(loc[1]);
         if (result == null) issues.add(path + "：缺失、全透明或无法读取");
-        textures.put(texture, Optional.ofNullable(result));
+        memo(textures,"texture-colors",texture,result);
         return result;
+    }
+
+    private void memo(Map<String,Optional<Integer>> memo,String domain,String key,Integer color) {
+        if(work==null){memo.put(key,Optional.ofNullable(color));return;}
+        long bytes=192L+key.length()*4L;
+        while(!memo.isEmpty() && (work.bytes(domain)+bytes>1048576 || work.available()<bytes)) {
+            var cursor=memo.entrySet().iterator();var old=cursor.next();long cost=192L+old.getKey().length()*4L;cursor.remove();work.release(domain,cost);
+        }
+        if(bytes<=1048576 && work.available()>=bytes){work.retain(domain,bytes);memo.put(key,Optional.ofNullable(color));}
     }
 
     private Integer vanillaColor(String path) {

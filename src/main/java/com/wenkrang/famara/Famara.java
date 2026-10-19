@@ -109,25 +109,26 @@ public final class Famara {
             return (JavaPlugin) getPluginMethod.invoke(null, bootLoaderClass);
         } catch (Exception e) {
             // 备用方案
-            return (JavaPlugin) Bukkit.getServer().getPluginManager().getPlugin("Famarareload");
+            JavaPlugin current=(JavaPlugin)Bukkit.getServer().getPluginManager().getPlugin("FamaraV2");return current!=null?current:(JavaPlugin)Bukkit.getServer().getPluginManager().getPlugin("Famarareload");
         }
     }
 
     public void onEnable() {
         //设置插件实例
         plugin = getPlugin();
-        dataFolder = plugin.getDataFolder();
+        dataFolder = com.wenkrang.famara.lib.DataFolders.of(plugin);
         mkdir(dataFolder);
         CeCompat.initialize(plugin);
+        Bukkit.getPluginManager().registerEvents(new com.wenkrang.famara.compat.CeLifecycle(),plugin);
 
         Sched.globalLater(() -> {
-            unpackFile("language.yml", new File("./plugins/Famarareload/language.yml"));
-            Translation.setCurrent(YamlConfiguration.loadConfiguration(new File("./plugins/Famarareload/language.yml")));
+            unpackFile("language.yml", new File(dataFolder,"language.yml"));
+            Translation.setCurrent(YamlConfiguration.loadConfiguration(new File(dataFolder,"language.yml")));
         }, 5);
 
         //加载配置
-        unpackFile("config.yml", new File("./plugins/Famarareload/config.yml"));
-        Config.setCurrent(YamlConfiguration.loadConfiguration(new File("./plugins/Famarareload/config.yml")));
+        // config升级只能按字段合并；不能沿用unpackFile的整文件删除逻辑。
+        Config.initialize(plugin);
 
         //Bstats统计
         int pluginId = 27448;
@@ -165,19 +166,19 @@ public final class Famara {
 
         ConsoleLogger.info("Initializing photo storage directory");
         // 初始化照片存储目录
-        dataFolder = plugin.getDataFolder();
+        dataFolder = com.wenkrang.famara.lib.DataFolders.of(plugin);
 
-        mkdir(new File(plugin.getDataFolder(), "pictures"));
+        mkdir(new File(com.wenkrang.famara.lib.DataFolders.of(plugin), "pictures"));
 
-        mkdir(new File(plugin.getDataFolder(), "players"));
+        mkdir(new File(com.wenkrang.famara.lib.DataFolders.of(plugin), "players"));
 
-        mkdir(new File(plugin.getDataFolder(), "update"));
+        mkdir(new File(com.wenkrang.famara.lib.DataFolders.of(plugin), "update"));
         // 加载颜色配置文件
         ColorManager.loadColor();
         com.wenkrang.famara.compat.CompatibilityReport.write(plugin);
         ColorManager.onChange(() -> {
             long ticket = CeCompat.requestRebuild();
-            Sched.async(() -> CeCompat.rebuildLast(ticket));
+            CeCompat.scheduleRebuild(ticket);
             Sched.global(ColorAudit::refresh);
         });
 
@@ -188,7 +189,8 @@ public final class Famara {
 
         ConsoleLogger.info("Starting renderer");
         // 启动渲染器
-        renderService = new RenderService(plugin.getDataFolder());
+        renderService = new RenderService(com.wenkrang.famara.lib.DataFolders.of(plugin));
+        com.wenkrang.famara.render.platform.PhotoRuntime.start(plugin);
         renderService.start();
 
         ConsoleLogger.info("Starting scheduled tasks");
@@ -208,7 +210,7 @@ public final class Famara {
         // 在异步线程构建 CE 资源包的贴图颜色索引
         CeCompat.refreshResources(dataFolder.toPath().resolve("ce-color-index.txt"));
         long initialIndex = CeCompat.requestRebuild();
-        Sched.async(() -> rebuildCePackIndex(initialIndex));
+        CeCompat.scheduleRebuild(initialIndex);
 
         // 对在线玩家执行加入检查
         getServer().getOnlinePlayers().forEach(OnPlayerJoinE::startCheck);
@@ -221,6 +223,8 @@ public final class Famara {
      * 可用于执行清理工作。
      */
     public void onDisable() {
+        com.wenkrang.famara.render.lib.LoadPhoto.close();
+        com.wenkrang.famara.render.platform.PhotoRuntime.stop();
         CeCompat.close();
         Sched.cancelAll();
     }

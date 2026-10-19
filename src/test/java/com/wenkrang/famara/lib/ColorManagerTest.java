@@ -69,8 +69,10 @@ class ColorManagerTest {
         assertEquals(0xc4ab7a, colors.get("TALL_DRY_GRASS"));
         assertEquals(0x2c6d0d, colors.get("JUNGLE_LEAVES"));
         for (String name : colors.keySet()) assertTrue(name.matches("[A-Z][A-Z0-9_]*"), name);
-        assertArrayEquals(Files.readAllBytes(Path.of("colors.yml")), Files.readAllBytes(Path.of("colors_new.yml")));
-        assertArrayEquals(Files.readAllBytes(Path.of("colors.yml")), Files.readAllBytes(Path.of("src/main/resources/colors.yml")));
+        try (var input = getClass().getResourceAsStream("/colors.yml")) {
+            assertNotNull(input);
+            assertArrayEquals(Files.readAllBytes(Path.of("src/main/resources/colors.yml")), input.readAllBytes());
+        }
     }
 
     @Test void legacyMigrationRequiresExactPublishedBaselineAndCreatesBackup() throws Exception {

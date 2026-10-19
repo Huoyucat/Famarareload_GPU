@@ -68,6 +68,10 @@ public class LoadCmd {
         }, (i, j) -> {
             if (!i.isOp()) return;
 
+            if(com.wenkrang.famara.render.platform.PhotoRuntime.textured()) {
+                try{int actual=com.wenkrang.famara.render.platform.PhotoRuntime.pixelLimit(Integer.parseInt(j.getFirst()));i.sendMessage("§7V2每批像素上限已设为 "+actual+"；不提高配置批次或共享CPU预算。");}
+                catch(RuntimeException error){i.sendMessage("§c未修改V2速度："+error.getMessage());}return;
+            }
             renderService.speed = Integer.parseInt(j.getFirst());
 
             if (renderService.speed > 500)
@@ -84,7 +88,7 @@ public class LoadCmd {
                 i.sendMessage(Translation.CURRENT.of("resourceByCraftEngine",
                         "§9§l[*]§r 资源包由 CraftEngine 分发，管理员可使用 /ce feature send-pack 重新发送"));
             } else {
-                i.sendMessage("§9§l[*]§r 独立模式可选资源包：plugins/Famarareload/" + com.wenkrang.famara.lib.StandalonePack.FILE_NAME);
+                i.sendMessage("§9§l[*]§r 独立模式可选资源包：实际数据目录/" + com.wenkrang.famara.lib.StandalonePack.FILE_NAME);
                 i.sendMessage("§7未加载只影响外观，拍照仍可用。管理员可将 ZIP 按普通服务端资源包托管/合并后分发。");
             }
         }));

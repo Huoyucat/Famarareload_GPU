@@ -12,6 +12,7 @@ import net.momirealms.craftengine.bukkit.entity.furniture.element.ItemFurnitureE
 import net.momirealms.craftengine.bukkit.item.BukkitItemManager;
 import net.momirealms.craftengine.bukkit.plugin.BukkitCraftEngine;
 import net.momirealms.craftengine.core.block.BlockStateWrapper;
+import net.momirealms.craftengine.core.block.BlockRegistryMirror;
 import net.momirealms.craftengine.core.block.ImmutableBlockState;
 import net.momirealms.craftengine.core.entity.culling.CullingData;
 import net.momirealms.craftengine.core.entity.furniture.FurnitureVariant;
@@ -44,8 +45,8 @@ import java.util.logging.Logger;
 
 /** 只在 CE 已启用且 API 检测成功后加载的隔离实现。 */
 public final class CraftEngineBackend implements CeCompat.Backend {
-    private static final Logger LOG = Logger.getLogger("Famara");
-    private boolean active = true;
+    private static final Logger LOG = Logger.getLogger("FamaraV2");
+    private volatile boolean active = true;
     private com.wenkrang.famara.loader.LoadCraftEngine listener;
 
     public CraftEngineBackend() throws ReflectiveOperationException {
@@ -54,11 +55,50 @@ public final class CraftEngineBackend implements CeCompat.Backend {
         net.momirealms.craftengine.core.block.setting.BlockSettings.class.getMethod("itemId");
         net.momirealms.craftengine.core.pack.Pack.class.getMethod("resourcePackFolders");
         net.momirealms.craftengine.bukkit.api.event.AsyncResourcePackCacheEvent.class.getMethod("cacheData");
-        AbstractPackManager.class.getField("PRESET_MODELS_BLOCK");
-        AbstractPackManager.class.getField("PRESET_MODERN_MODELS_ITEM");
-        AbstractPackManager.class.getField("PRESET_LEGACY_MODELS_ITEM");
+        ApiShapeProbe.publicStaticMaps(AbstractPackManager.class,"PRESET_MODELS_BLOCK",
+                "PRESET_MODERN_MODELS_ITEM","PRESET_LEGACY_MODELS_ITEM");
     }
     public boolean enabled() { return active; }
+    public boolean reloading(){return BukkitCraftEngine.instance().isReloading();}
+    public CeCompat.VisualCursor visualCursor() {
+        if(reloading())throw new IllegalStateException("CE正在重载");
+        var plugin=BukkitCraftEngine.instance();var manager=plugin.blockManager();var network=plugin.networkManager();
+        var blocks=manager.loadedBlocks().values().iterator();
+        // false与CE发给原版客户端的数据一致，不是客户端mod的自定义注册表分支。
+        var vanilla=new CeVanillaRemapCursor(manager.vanillaBlockStateCount(),BlockRegistryMirror.size(),
+                id->network.remapBlockState(id,false),id->{
+                    BlockStateWrapper state=BlockRegistryMirror.byId(id);
+                    if(state==null)throw new IllegalStateException("CE注册表缺少映射状态："+id);
+                    return state.getAsString();
+                });
+        return new CeCompat.VisualCursor() {
+            Iterator<ImmutableBlockState> states=Collections.emptyIterator();
+            boolean customDone;
+            final ArrayDeque<CeCompat.VisualState> aliases=new ArrayDeque<>(2);
+            public boolean done(){return customDone && aliases.isEmpty() && vanilla.done();}
+            public List<CeCompat.VisualState> next(int maximum) {
+                if(maximum<=0)throw new IllegalArgumentException("视觉采集批次必须为正");
+                List<CeCompat.VisualState> output=new ArrayList<>();
+                for(int work=0;work<maximum;work++) {
+                    if(!aliases.isEmpty()){output.add(aliases.removeFirst());continue;}
+                    if(customDone) {
+                        if(vanilla.done())break;
+                        output.addAll(vanilla.next(1));
+                    } else if(states.hasNext()) {
+                        ImmutableBlockState state=states.next();if(state==null || state.isEmpty())continue;
+                        BlockStateWrapper server=state.customBlockState(),visual=state.visualBlockState(),original=state.vanillaBlockState();
+                        if(server==null || visual==null)throw new IllegalStateException("CE方块缺少服务端/可见状态");
+                        BlockData data=CraftEngineBlocks.getBukkitBlockData(state);
+                        aliases.addAll(CeVisualStateAliases.freeze(server.getAsString(),data.getAsString(),data.getMaterial().getKey().toString(),
+                                state.owner().value().id().asString(),original==null?null:original.getAsString(),visual.getAsString()));
+                        output.add(aliases.removeFirst());
+                    } else if(blocks.hasNext())states=blocks.next().variantProvider().states().iterator();
+                    else customDone=true;
+                }
+                return List.copyOf(output);
+            }
+        };
+    }
     public ItemStack buildItem(String id) {
         var definition = CraftEngineItems.byId(id);
         return definition == null ? null : definition.buildBukkitItem();
@@ -158,6 +198,10 @@ public final class CraftEngineBackend implements CeCompat.Backend {
         return session.definitions.computeIfAbsent(id, key -> {
             Integer manual = session.palette.configured(key);
             if (manual != null) return Optional.of(manual);
+            if(session.frozen) {
+                ItemModel model=session.models.get(key);
+                return Optional.ofNullable(model==null?session.textures.itemColor(key,PackColorIndex.ItemState.EMPTY):session.textures.itemColor(model.resource(),model.state()));
+            }
             var definition = CraftEngineItems.byId(key);
             if (definition != null) return Optional.ofNullable(itemColor(definition.buildBukkitItem(), key, session, "fixed"));
             return Optional.ofNullable(session.textures.itemColor(key, PackColorIndex.ItemState.EMPTY));

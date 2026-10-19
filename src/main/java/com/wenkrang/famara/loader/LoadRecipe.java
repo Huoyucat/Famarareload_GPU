@@ -31,7 +31,7 @@ public class LoadRecipe {
 
         // 遍历所有配方并注册
         recipes.forEach((index, itemStacks) -> {
-            NamespacedKey key = new NamespacedKey(Famara.getPlugin(), String.valueOf(index));
+            NamespacedKey key = new NamespacedKey("famarareload",String.valueOf(index));
             // CraftEngine 重载后物品会重新生成，先移除旧配方再注册
             Bukkit.getServer().removeRecipe(key);
 

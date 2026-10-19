@@ -118,9 +118,23 @@ public final class RuntimeCompat {
         // 旧版整数 CMD 属于 CE 模型分配，不拿它保存开关，防止损坏 CE 物品身份/外观。
         return meta;
     }
+    /** 读取所属entity上下文中的服务器真实天空变暗值，不用客户端时间公式替代维度行为。 */
+    public static int skyDarken(World world) {
+        if(!hasSkyLight(world))return 0;
+        try {
+            Object handle=world.getClass().getMethod("getHandle").invoke(world);
+            int value=((Number)handle.getClass().getMethod("getSkyDarken").invoke(handle)).intValue();
+            if(value<0 || value>15)throw new IllegalStateException("服务端天空暗化值越界");return value;
+        } catch(ReflectiveOperationException e){throw new IllegalStateException("缺少服务端天空暗化只读接口",e);}
+    }
     public static ChunkSnapshot snapshot(Chunk chunk) {
         return FOUR_ARGUMENT_SNAPSHOT == null ? chunk.getChunkSnapshot(false, false, false)
                 : (ChunkSnapshot) invoke(FOUR_ARGUMENT_SNAPSHOT, chunk, false, false, false, true);
+    }
+    /** V2准备阶段需要真实生物群系、温度/降雨和光照；最终场景不保留此API对象。 */
+    public static ChunkSnapshot texturedSnapshot(Chunk chunk) {
+        return FOUR_ARGUMENT_SNAPSHOT == null ? chunk.getChunkSnapshot(false,true,true)
+                : (ChunkSnapshot)invoke(FOUR_ARGUMENT_SNAPSHOT,chunk,false,true,true,true);
     }
     public static Integer mapColor(BlockData state) {
         if (state == null || MAP_COLOR == null) return null;

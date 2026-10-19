@@ -328,10 +328,11 @@ public final class BootLoader extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
+            for(String previous:java.util.List.of("Famarareload","Famara")){var old=getServer().getPluginManager().getPlugin(previous);if(old!=null && old!=this)throw new IllegalStateException("旧版插件仍在加载，请仅保留一个FamaraV2 JAR："+previous);}
             Manager.bootFromJar(this.getFile(), "./plugins/famara/clazz/", "com.wenkrang.famara.Famara");
         } catch (IOException | ClassNotFoundException | InvocationTargetException | NoSuchMethodException | InstantiationException |
                  IllegalAccessException e) {
-            getLogger().log(Level.SEVERE, "Failed to boot Famara plugin", e);
+            getLogger().log(Level.SEVERE, "Failed to boot FamaraV2 plugin", e);
             throw new RuntimeException("Boot failed due to exception", e);
         }
     }

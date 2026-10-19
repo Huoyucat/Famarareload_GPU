@@ -11,7 +11,7 @@ import java.util.List;
 public class ItemUtils {
     public static boolean checkName(ItemStack itemStack, String s) {
         if (itemStack == null || itemStack.getItemMeta() == null) return false;
-        return itemStack.getItemMeta().getDisplayName().equalsIgnoreCase(s);
+        return s.equalsIgnoreCase(itemStack.getItemMeta().getDisplayName());
     }
 
     /**
@@ -44,17 +44,21 @@ public class ItemUtils {
         if (!isCamera(itemStack)) return itemStack;
         ItemMeta meta = itemStack.getItemMeta();
         List<String> lore = meta.getLore();
-        if (lore != null && lore.size() >= 3) return itemStack;
+        if(lore!=null && lore.size()>=3)return com.wenkrang.famara.render.platform.PhotoRuntime.synchronizeCamera(itemStack);
 
         ItemStack standard = ItemSystem.getOrNull("camera");
         if (standard == null) return itemStack;
         standard.setAmount(itemStack.getAmount());
         ItemMeta standardMeta = setViewfinderOpen(standard.getItemMeta(), isViewfinderOpen(meta));
         standard.setItemMeta(standardMeta);
-        return standard;
+        com.wenkrang.famara.render.platform.CameraIdentity.copy(itemStack,standard,true);
+        return com.wenkrang.famara.render.platform.PhotoRuntime.synchronizeCamera(standard);
     }
 
     public static int getFilmAmount(ItemStack itemStack) {
+        return rawFilmAmount(com.wenkrang.famara.render.platform.PhotoRuntime.synchronizeCamera(itemStack));
+    }
+    public static int rawFilmAmount(ItemStack itemStack) {
         List<String> lore = itemStack.getItemMeta().getLore();
         if (lore == null || lore.size() < 3) return 0;
         String s = lore.get(2);
@@ -63,9 +67,12 @@ public class ItemUtils {
     }
 
     public static ItemStack setFilmAmount(ItemStack itemStack, int i) {
-        itemStack = normalizeCamera(itemStack);
+        itemStack=normalizeCamera(itemStack);
+        return writeRawFilm(itemStack,i);
+    }
+    public static ItemStack writeRawFilm(ItemStack itemStack,int i) {
         ItemMeta itemMeta = itemStack.getItemMeta();
-        List<String> lore = itemMeta.getLore();
+        List<String> lore = new java.util.ArrayList<>(java.util.Objects.requireNonNull(itemMeta.getLore()));
         if (i <= 0) {
             lore.set(2, "§7未装填胶卷");
         } else lore.set(2, "§7已装填彩色胶卷（16 / " + i + "）");

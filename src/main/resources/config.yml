@@ -1,5 +1,125 @@
 version: 5
-# 拍照时光线追踪的最远距离（格），范围 16 ~ 256
-render-distance: 256
-# 取景器相对旧版的额外放大强度，0 为不放大，1 为旧版，默认减半；不改变照片视野
+# 默认V2纹理采样；显式LEGACY保留旧模式。缺少基础资源时明确拒绝，不静默退旧。
+renderer-mode: "TEXTURED"
+# 唯一拍摄距离（16–256格）；大距离仍受区块/扫描/实例和CPU限额保护。
+render-distance: 128
 viewfinder-zoom-strength: 0.5
+render-v2-schema: 11
+# 以下是正式运行默认，不是原离线样例。384MiB仅为快照域，非插件总堆上限。
+# 如果你不清楚这是什么，请不要修改参数。
+render-v2:
+  # V2消费者共用此账本；旧CE取色临时改用独立280MiB（256MiB存活＋24MiB临时），插件合计预约可能超过512MiB。
+  # 快照384MiB是V2子上限，不额外叠加。
+  memory:
+    maximumBytes: 536870912
+    occlusion: true
+  # 默认内置26.3纯资源数据，无需上传客户端JAR；也可显式填写外置资源覆盖路径。
+  baseResources: "bundled"
+  # 资源版本独立于服务端运行版本。
+  resourceVersion: "26.3"
+  assets:
+    maxEntries: 200000
+    maxEntryBytes: 4194304
+    maxTotalBytes: 134217728
+    maxTexturePixels: 1048576
+    maxAnimationFrames: 4096
+    maxModelFaces: 20000
+    maxReferenceDepth: 64
+    maxJsonDepth: 64
+    maxJsonNodes: 200000
+    maxModelSpan: 64
+  cache:
+    generations: 2
+    retainedBytes: 268435456
+  assetBuild:
+    # 磁盘来源ZIP的累计压缩大小限制，不是允许读入内存的字节数；实际方块依赖仍受assets/512MiB总账本限制。
+    maximumSourceBytes: 1073741824
+    operationsPerStep: 128
+    dispatchNanos: 1000000
+    quantumCpuNanos: 1000000
+    maxStepNanos: 8000000
+    timeoutNanos: 120000000000
+  # 拍照合计CPU为2000ms/s（约两核，不是每worker各一份）；512MiB总账本；场景工作集动态使用预付窗口，不按实例重复计算共享模型。
+  pipeline:
+    workers: 2
+    maxJobs: 2
+    perPlayer: 1
+    sceneMemoryBytes: 536870912
+    dispatchIntervalNanos: 1000000
+    quantumCpuNanos: 1000000
+    maxBatchCpuNanos: 8000000
+    scanBatchCpuNanos: 10000000
+    cpuMillisPerSecond: 2000
+    burstMillis: 100
+    batchPixels: 1024
+    timeoutNanos: 120000000000
+  # CE映射最多10万条/128MiB；按实际输入预约，不预分配上限，仍共用512MiB总账本。
+  visuals:
+    maximumStates: 100000
+    maximumFrozenBytes: 134217728
+    entriesPerTick: 512
+    nanosPerTick: 1000000
+    quantumCpuNanos: 1000000
+  biomes:
+    maximum: 4096
+    entriesPerTick: 4
+    nanosPerTick: 1000000
+    quantumCpuNanos: 1000000
+  # 每块保守预约2MiB，固定小窗口最多两块/4MiB；每块转换后归还，384MiB仍是共享快照子上限。
+  capture:
+    windowChunks: 2
+    maxRequests: 2
+    maxChunksPerRequest: 384
+    maxInflight: 2
+    startsPerTick: 2
+    bytesPerChunk: 2097152
+    maximumSnapshotBytes: 402653184
+    nanosPerTick: 1000000
+    quantumCpuNanos: 1000000
+    timeoutNanos: 60000000000
+  # 实例65536；索引和候选扫描仍独立有界，不足时报告实际值而非降质。
+  preparation:
+    maximumScannedCells: 4000000
+    maximumStates: 2048
+    maximumInstances: 65536
+    maximumIndexEntries: 786432
+  entities:
+    entitiesPerChunk: 512
+    maximumBoxes: 256
+  ledger:
+    maxCameras: 10000
+    maxJobs: 10000
+    maxFileBytes: 67108864
+  io:
+    maximum: 32
+    intervalNanos: 5000000
+    quantumNanos: 1000000
+  maps:
+    maximumCanvases: 256
+    maximumRecoveryRequests: 16
+    maximumCachedFrames: 128
+  # 实验性保守远景默认关闭；本轮对照测试可显式开启，不将试验阈值作为生产画质默认。
+  # 仅普通静态满块2×2×2组；CE/透明/孔洞/流体保留精细路径。
+  lod:
+    enabled: false
+    minDistance: 64
+    maxProjectedPixels: 4
+  shot:
+    samples: 1
+    filter: "MIPMAP"
+    directionalLight: true
+    ambientFloor: 0.3
+    cutoutThreshold: 0.5
+    maxTransparentLayers: 32
+    backgroundRgb: 9418200
+    animationTicks: 0
+    traceLimits:
+      maxCells: 10000
+      maxIntersections: 1000
+      maxTests: 10000
+    materialOverrides: {}
+  allowVanillaCe: []
+  # 仅初次准备的合计CPU加速档；就绪/失败后回到pipeline预算，不是每线程一份。
+  loading:
+    cpuMillisPerSecond: 1000
+    burstMillis: 50

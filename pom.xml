@@ -6,13 +6,15 @@
 
     <groupId>com.wenkrang</groupId>
     <artifactId>Famara</artifactId>
-    <version>1.7.1</version>
+    <version>2.0.0</version>
     <packaging>jar</packaging>
 
-    <name>Famara</name>
+    <name>FamaraV2</name>
 
     <properties>
         <java.version>21</java.version>
+        <famara.bundledDir>${project.basedir}/.claude/generated/embedded-base</famara.bundledDir>
+        <famara.assets.bootstrap>false</famara.assets.bootstrap>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <craftengine.version>26.9.2</craftengine.version>
         <surefire.version>3.5.5</surefire.version>
@@ -21,6 +23,23 @@
     <build>
         <defaultGoal>clean package</defaultGoal>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId><artifactId>maven-antrun-plugin</artifactId><version>3.1.0</version>
+                <executions><execution><id>verify-bundled-base</id><phase>process-resources</phase><goals><goal>run</goal></goals>
+                    <configuration><skip>${famara.assets.bootstrap}</skip><target>
+                        <available file="${famara.bundledDir}/render-base/base-26.3.zip" property="base.present"/>
+                        <fail unless="base.present" message="缺少内置基础资源；先用bootstrap compile编译BundledBaseBuilder，再提供客户端生成私有资源目录。"/>
+                        <checksum file="${famara.bundledDir}/render-base/base-26.3.zip" algorithm="SHA-256" property="actual.base.sha"/>
+                        <loadfile property="expected.base.sha" srcFile="${famara.bundledDir}/render-base/base-26.3.zip.sha256"><filterchain><striplinebreaks/></filterchain></loadfile>
+                        <condition property="base.verified"><equals arg1="${actual.base.sha}" arg2="${expected.base.sha}"/></condition>
+                        <fail unless="base.verified" message="内置基础资源SHA256不符，不构建缺资源或损坏的正式包。"/>
+                        <checksum file="${famara.bundledDir}/render-base/manifest.json" algorithm="SHA-256" property="actual.manifest.sha"/>
+                        <loadfile property="expected.manifest.sha" srcFile="${famara.bundledDir}/render-base/manifest.json.sha256"><filterchain><striplinebreaks/></filterchain></loadfile>
+                        <condition property="manifest.verified"><equals arg1="${actual.manifest.sha}" arg2="${expected.manifest.sha}"/></condition>
+                        <fail unless="manifest.verified" message="内置资源清单损坏。"/>
+                    </target></configuration>
+                </execution></executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -45,6 +64,10 @@
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <relocations>
                         <relocation>
+                            <pattern>org.objectweb.asm</pattern>
+                            <shadedPattern>com.wenkrang.famara.internal.asm</shadedPattern>
+                        </relocation>
+                        <relocation>
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.wenkrang.famara</shadedPattern>
                         </relocation>
@@ -61,6 +84,7 @@
             </plugin>
         </plugins>
         <resources>
+            <resource><directory>${famara.bundledDir}</directory><filtering>false</filtering></resource>
             <!-- 文本配置需要变量替换 -->
             <resource>
                 <directory>src/main/resources</directory>
@@ -88,6 +112,25 @@
     </repositories>
 
     <dependencies>
+        <!-- 只读解析原版静态形状定义，不加载客户端类；随插件隔离打包，不是前置插件。 -->
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm-tree</artifactId>
+            <version>9.9.1</version>
+        </dependency>
+        <!-- Paper 已提供，显式固定编译接口；不重定位跨 CE 边界的 Gson/JOML。 -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.joml</groupId>
+            <artifactId>joml</artifactId>
+            <version>1.10.5</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
@@ -143,6 +186,16 @@
                 <configuration><excludes>
                     <exclude>**/CraftEngineBackend.java</exclude>
                     <exclude>**/LoadCraftEngine.java</exclude>
+                </excludes>
+                <testExcludes>
+                    <!-- CE 后端测试仅在 ce-integration 编译/运行；纯核心与无 CE 测试仍执行。 -->
+                    <testExclude>**/CeCompatTest.java</testExclude>
+                </testExcludes></configuration>
+            </plugin><plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration><excludes>
+                    <exclude>**/CeCompatTest.java</exclude>
                 </excludes></configuration>
             </plugin></plugins></build>
         </profile>

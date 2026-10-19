@@ -32,3 +32,25 @@ qodana.sarif.json
 /colors_new.yml
 # 上游残留 CI 工作流（指向旧仓库 Wenkrangha/Famara，更新后再移除本行）
 .github/
+
+# 编译产物、打包文件与运行日志
+*.class
+*.jar
+*.war
+*.zip
+*.log
+logs/
+
+# 本地编辑器、缓存与系统文件
+.vscode/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.DS_Store
+Thumbs.db
+
+# 本地说明、实验记录与宣传素材（仅同步源码及必要资源）
+/docs/
+/*论坛介绍.md
+/famarareload-logo.png
+/img/famarareload-logo.png

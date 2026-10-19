@@ -127,12 +127,13 @@ public class LoadCraftEngine implements Listener {
 
     @EventHandler
     public void onCraftEngineReload(CraftEngineReloadEvent event) {
+        CeCompat.invalidateVisualResources();
         // 事件可能在异步线程触发，统一切回全局区域线程
         Sched.global(() -> {
             LoadCraftEngine.ensureLoaded();
             CeCompat.refreshResources(Famara.dataFolder.toPath().resolve("ce-color-index.txt"));
             long ticket = CeCompat.requestRebuild();
-            Sched.async(() -> Famara.rebuildCePackIndex(ticket));
+            CeCompat.scheduleRebuild(ticket);
         });
     }
 
@@ -144,7 +145,7 @@ public class LoadCraftEngine implements Listener {
         Sched.global(() -> {
             // 旧版整数 CMD/新模型资源键可能在生成过程中重新分配，生成后更新组件映射。
             CeCompat.refreshItemModels();
-            Sched.async(() -> CeCompat.rebuildLast(ticket));
+            // refreshItemModels已请求最新索引；不再重复排同一代工作。
         });
     }
 
@@ -152,6 +153,6 @@ public class LoadCraftEngine implements Listener {
     public void onResourcePackCached(net.momirealms.craftengine.bukkit.api.event.AsyncResourcePackCacheEvent event) {
         CeCompat.externalSources(event.cacheData().externalFolders(), event.cacheData().externalZips());
         long ticket = CeCompat.requestRebuild();
-        Sched.async(() -> CeCompat.rebuildLast(ticket));
+        CeCompat.scheduleRebuild(ticket);
     }
 }

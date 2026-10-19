@@ -61,7 +61,7 @@ public final class ColorAudit {
                 + "\n\n无效配置：\n" + String.join("\n", snapshot.invalid);
         Sched.async(() -> {
             try { Files.writeString(Famara.dataFolder.toPath().resolve("color-audit.txt"), text, StandardCharsets.UTF_8); }
-            catch (Exception e) { Logger.getLogger("Famara").warning("写入颜色审计失败：" + e.getMessage()); }
+            catch (Exception e) { Logger.getLogger("FamaraV2").warning("写入颜色审计失败：" + e.getMessage()); }
         });
     }
 
@@ -75,6 +75,6 @@ public final class ColorAudit {
                 + "；仍无颜色 " + snapshot.unresolved.size() + "；无效配置 " + snapshot.invalid.size());
         sender.sendMessage("待补充显式颜色 " + page + "/" + pages + "，地图色回退不属于渲染失败：");
         names.stream().skip((long) (page - 1) * 12).limit(12).forEach(sender::sendMessage);
-        sender.sendMessage("完整报告：plugins/Famarareload/color-audit.txt；下一页：/fa color " + Math.min(pages, page + 1));
+        sender.sendMessage("完整报告：插件实际数据目录下的color-audit.txt；下一页：/fa color " + Math.min(pages, page + 1));
     }
 }
