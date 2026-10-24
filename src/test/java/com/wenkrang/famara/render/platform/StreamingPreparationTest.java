@@ -52,7 +52,7 @@ class StreamingPreparationTest {
                 assertTrue(maximumRaw<=2097152L*window);assertTrue(copies.values().stream().allMatch(count->count==1));assertEquals(0,service.metrics().reservedBytes());
                 var result=work.result();assertTrue(Long.parseLong(result.sourceMetadata().get("occludedHosts"))>0);
                 assertTrue(Long.parseLong(result.sourceMetadata().get("fastInterior"))>0);assertTrue(Long.parseLong(result.sourceMetadata().get("scanSlices"))>0);
-                var cached=WorldPreparation.class.getDeclaredField("cachedChunk");cached.setAccessible(true);assertNull(cached.get(work),"冻结数据释放后缓存不能继续钉住原块");
+                var cached=WorldPreparation.class.getDeclaredField("lookupValues");cached.setAccessible(true);assertTrue(Arrays.stream((FrozenChunk[])cached.get(work)).allMatch(Objects::isNull),"冻结数据释放后缓存不能继续钉住原块");
                 assertTrue(Integer.parseInt(result.sourceMetadata().get("skippedBlockSnapshots"))>0,"石墙后确定不可见块应跳过块快照，但实体元数据仍走owner");
                 assertTrue(result.scene().instances().size()<20480);result.lease().close();result.memory().close();
             }

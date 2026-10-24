@@ -131,7 +131,7 @@ public final class VoxelTracer {
                     BakedQuad.Uv p = quad.uv().get(0), a = quad.uv().get(1), b = quad.uv().get(3);
                     hits.add(new Hit(instance, m, q, quad, t, p.u() + s * (a.u() - p.u()) + v * (b.u() - p.u()),
                             p.v() + s * (a.v() - p.v()) + v * (b.v() - p.v())));
-                    if (quad.opacity()==1 && !quad.forceTranslucent() && scene.assets().texture(quad.texture()).opaque())
+                    if (quad.opacity()==1 && !quad.forceTranslucent() && scene.texture(quad.texture()).opaque())
                         nearestOpaque = Math.min(nearestOpaque, t);
                 }
             }

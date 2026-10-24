@@ -70,6 +70,8 @@ public final class BootLoader extends JavaPlugin {
          */
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            // JNI classes belong to the stable plugin loader across core hot updates.
+            if(name.startsWith("org.jocl."))return getParent().loadClass(name);
             Class<?> clazz;
             // 1. 优先尝试当前ClassLoader加载（关键：确保依赖类也通过当前ClassLoader加载）
             try {
@@ -138,18 +140,10 @@ public final class BootLoader extends JavaPlugin {
          */
         @Override
         public URL getResource(String name) {
-            File Dir = new File(classDir);
-            if (Dir.exists()) {
-                File[] files = Dir.listFiles();
-                for (File file : files) {
-                    if (file.getName().equals(name)) {
-                        try {
-                            return file.toURI().toURL();
-                        } catch (MalformedURLException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }
-                }
+            java.nio.file.Path root=java.nio.file.Path.of(classDir).toAbsolutePath().normalize();
+            java.nio.file.Path resource=root.resolve(name).normalize();
+            if(resource.startsWith(root) && java.nio.file.Files.isRegularFile(resource)) {
+                try{return resource.toUri().toURL();}catch(MalformedURLException error){throw new IllegalStateException(error);}
             }
             return super.getResource(name);
         }

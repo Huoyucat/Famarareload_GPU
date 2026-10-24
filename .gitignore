@@ -40,6 +40,8 @@ qodana.sarif.json
 *.zip
 *.log
 logs/
+!/baseline/logs/
+!/baseline/logs/*.txt
 
 # 本地编辑器、缓存与系统文件
 .vscode/
@@ -51,6 +53,21 @@ Thumbs.db
 
 # 本地说明、实验记录与宣传素材（仅同步源码及必要资源）
 /docs/
+!/docs/
+/docs/*
+!/docs/render-v2/
+/docs/render-v2/*
+!/docs/render-v2/runtime-experiment.json
+!/docs/render-v2/offline-experiment.json
 /*论坛介绍.md
 /famarareload-logo.png
 /img/famarareload-logo.png
+
+# 可重建的本地发行交付物
+/artifacts/
+
+# Generated locally from a developer-owned Minecraft 26.2 client; do not commit client assets.
+/src/main/resources/render-actors/models-26.2.json
+/src/main/resources/render-actors/vanilla-assets-26.2.zip
+/src/main/resources/render-actors/manifest-26.2.json
+/.mvn/jvm.config.local

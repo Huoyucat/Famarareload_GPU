@@ -27,6 +27,26 @@ class RenderMemoryBudgetTest {
         }
         assertEquals(0,memory.snapshot().live());
     }
+    @Test void incrementalPhotosShareUnusedCapacityAndFailedClaimsAreAtomic() {
+        var memory=new RenderMemoryBudget(100);
+        try(var first=MemoryScope.incremental(memory,"photo",80);var second=MemoryScope.incremental(memory,"photo",80)) {
+            assertEquals(0,memory.snapshot().live());first.claim(35);second.claim(40);
+            assertEquals(75,memory.snapshot().live());assertThrows(RejectedExecutionException.class,()->first.claim(30));
+            assertEquals(35,first.live());assertEquals(75,memory.snapshot().live());
+            second.release(20);first.claim(30);assertEquals(85,memory.snapshot().live());
+            assertThrows(RejectedExecutionException.class,()->first.claim(16));assertEquals(65,first.live());
+        }
+        assertEquals(0,memory.snapshot().live());
+    }
+    @Test void incrementalReservationKeepsBoundedSlackAcrossTemporaryObjects() {
+        var memory=new RenderMemoryBudget(64L*1024*1024);
+        try(var scope=MemoryScope.incremental(memory,"photo",32L*1024*1024)) {
+            for(int i=0;i<10000;i++){scope.claim(100);scope.release(100);}
+            assertEquals(0,scope.live());assertEquals(512*1024,memory.snapshot().live());assertEquals(512*1024,memory.snapshot().peak());
+            scope.claim(3L*1024*1024);scope.release(3L*1024*1024);assertEquals(0,memory.snapshot().live());
+        }
+        assertEquals(0,memory.snapshot().live());
+    }
     @Test void sharedOwnerRetainsAllocationUntilTheLastConsumerExits()throws Exception {
         var memory=new RenderMemoryBudget(512);var shared=new SharedMemory(memory.reserve("table",32));var first=shared.retain();var second=shared.retain();
         shared.close();shared.close();assertEquals(32,memory.snapshot().live());first.close();assertEquals(32,memory.snapshot().live());second.close();second.close();assertEquals(0,memory.snapshot().live());

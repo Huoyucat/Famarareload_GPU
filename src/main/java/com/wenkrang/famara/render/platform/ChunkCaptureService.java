@@ -22,7 +22,14 @@ public final class ChunkCaptureService implements AutoCloseable {
                 throw new IllegalArgumentException("区块采集限额无效");
         }
     }
-    @FunctionalInterface public interface Extras {List<com.wenkrang.famara.render.scene.LegacyEntity> capture(Chunk chunk);}
+    @FunctionalInterface public interface Extras {
+        List<com.wenkrang.famara.render.scene.LegacyEntity> capture(Chunk chunk);
+        default CompletionStage<List<com.wenkrang.famara.render.scene.ActorGeometry>> finishActors(){return CompletableFuture.completedFuture(List.of());}
+        default CompletionStage<List<com.wenkrang.famara.render.scene.ActorGeometry>> finishActors(com.wenkrang.famara.render.kernel.ConservativeOcclusion visibility){return finishActors();}
+        default Map<String,String> actorMetadata(){return Map.of();}
+        default void cancelActors() {}
+        default AutoCloseable transferActorResources(){return ()->{};}
+    }
     public record Captured(ChunkSnapshot snapshot,long startedNanos,long completedNanos,List<com.wenkrang.famara.render.scene.LegacyEntity> entities) {
         public Captured(ChunkSnapshot snapshot,long startedNanos,long completedNanos){this(snapshot,startedNanos,completedNanos,List.of());}
         public Captured{entities=List.copyOf(entities);}

@@ -17,6 +17,11 @@ class CeVisualResourceServiceTest {
         RenderFixtures f=new RenderFixtures();f.png("test:tile",1,1,0xff00ff00);f.cube("test:block/model","test:tile");f.block("test:block","test:block/model");
         for(var e:f.files.entrySet()){Path file=directory.resolve(e.getKey());Files.createDirectories(file.getParent());Files.write(file,e.getValue());}return directory;
     }
+    private void driveUntilSettled(CeVisualResourceService service,int seconds)throws Exception {
+        // Like the real timer, drive later ticks after a wall-budget yield. Keep the test's deadline.
+        long deadline=System.nanoTime()+TimeUnit.SECONDS.toNanos(seconds);
+        while(!service.readiness().toCompletableFuture().isDone() && System.nanoTime()<deadline){service.tick();Thread.sleep(1);}
+    }
     @Test void freezesRegistryInBoundedSlicesAndPublishesOnlyMatchingAssetEpoch() throws Exception {
         Path source=fixture();CeCompat.backendForTests(new CeCompat.Backend() {
             public boolean enabled(){return true;}
@@ -35,7 +40,7 @@ class CeVisualResourceServiceTest {
             var background=new BudgetedWorkRunner(4,1_000_000,1_000_000,budget);
             var service=new CeVisualResourceService(source,RenderFixtures.LIMITS,new CeVisualResourceService.Limits(10,1024*1024,1,50_000_000,1_000_000),repository,loader,background,budget,errors::add)) {
             service.tick();assertFalse(service.readiness().toCompletableFuture().isDone());service.tick();assertFalse(service.readiness().toCompletableFuture().isDone());service.tick();
-            var ready=service.readiness().toCompletableFuture().get(10,TimeUnit.SECONDS);assertEquals(3,ready.table().size());assertEquals(1,ready.table().vanillaRemapCount());
+            driveUntilSettled(service,10);var ready=service.readiness().toCompletableFuture().get(0,TimeUnit.MILLISECONDS);assertEquals(3,ready.table().size());assertEquals(1,ready.table().vanillaRemapCount());
             try(var input=service.acquire()){assertEquals(ready.generation(),input.lease().generation().id());assertSame(ready.table(),input.table());}
             CeCompat.invalidateVisualResources();assertTrue(service.ready().isEmpty());assertThrows(IllegalStateException.class,service::acquire);
             assertTrue(errors.isEmpty());
@@ -91,7 +96,8 @@ class CeVisualResourceServiceTest {
             var loader=org.mockito.Mockito.mock(BudgetedAssetLoader.class);
             org.mockito.Mockito.when(loader.prepareSources(org.mockito.ArgumentMatchers.anyList(),org.mockito.ArgumentMatchers.any())).thenReturn(CompletableFuture.completedFuture(new BudgetedAssetLoader.Staged(new BudgetedAssetLoader.Result(ticket,1,1,1,candidate.estimatedRetainedBytes()),candidate)));
             try(var service=new CeVisualResourceService(source,RenderFixtures.LIMITS,new CeVisualResourceService.Limits(10,1048576,1,10000000,1000000),repository,loader,background,budget,error->{})) {
-                service.tick();assertThrows(ExecutionException.class,()->service.readiness().toCompletableFuture().get(5,TimeUnit.SECONDS));
+                service.tick();driveUntilSettled(service,5);
+                assertThrows(ExecutionException.class,()->service.readiness().toCompletableFuture().get(0,TimeUnit.MILLISECONDS));
                 try(var lease=repository.acquire()){assertEquals(old,lease.generation().id());}assertTrue(service.ready().isEmpty());
             }
         }

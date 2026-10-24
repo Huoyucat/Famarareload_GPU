@@ -12,7 +12,8 @@
     <name>FamaraV2</name>
 
     <properties>
-        <java.version>21</java.version>
+        <!-- Java 25 target: shared FFM arenas give staging buffers deterministic lifetime. -->
+        <java.version>25</java.version>
         <famara.bundledDir>${project.basedir}/.claude/generated/embedded-base</famara.bundledDir>
         <famara.assets.bootstrap>false</famara.assets.bootstrap>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -53,7 +54,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>${surefire.version}</version>
                 <configuration>
-                    <argLine>-javaagent:"${settings.localRepository}/org/mockito/mockito-core/5.23.0/mockito-core-5.23.0.jar"</argLine>
+                    <argLine>-Xmx768m -XX:MaxDirectMemorySize=128m -XX:MaxMetaspaceSize=256m -XX:ActiveProcessorCount=2 -javaagent:"${settings.localRepository}/org/mockito/mockito-core/5.23.0/mockito-core-5.23.0.jar"</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -91,6 +92,7 @@
                 <filtering>true</filtering>
                 <excludes>
                     <exclude>craftengine/**</exclude>
+                    <exclude>render-actors/*.zip</exclude>
                 </excludes>
             </resource>
             <!-- CraftEngine 资源包含贴图与音效等二进制文件，不能做变量替换 -->
@@ -99,6 +101,7 @@
                 <filtering>false</filtering>
                 <includes>
                     <include>craftengine/**</include>
+                    <include>render-actors/*.zip</include>
                 </includes>
             </resource>
         </resources>
@@ -112,6 +115,12 @@
     </repositories>
 
     <dependencies>
+        <!-- JNI is supplied by this pinned JOCL JAR; the system NVIDIA/OpenCL ICD is not bundled. -->
+        <dependency>
+            <groupId>org.jocl</groupId>
+            <artifactId>jocl</artifactId>
+            <version>2.0.6</version>
+        </dependency>
         <!-- 只读解析原版静态形状定义，不加载客户端类；随插件隔离打包，不是前置插件。 -->
         <dependency>
             <groupId>org.ow2.asm</groupId>

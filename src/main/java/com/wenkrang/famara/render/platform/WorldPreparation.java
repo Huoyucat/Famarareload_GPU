@@ -47,6 +47,11 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
     private java.util.function.BooleanSupplier inputsCurrent=()->true;
     private ChunkCaptureService.Extras extras;
     private Iterator<LegacyEntity> entityIterator;
+    private java.util.concurrent.CompletableFuture<List<ActorGeometry>> actorsReady;
+    private Iterator<ActorGeometry> actorIterator;
+    private AutoCloseable actorResources;
+    private int livingActorCount;
+    private Map<String,String> actorMetadata=Map.of();
     private boolean addingEntities;
     private int entityCount;
     private AutoCloseable tableMemory;
@@ -57,8 +62,9 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
     private long scanned,culled,skippedCells,fastInterior,scanCpuNanos,scanWallNanos,scanSlices,scanStarted,scanCompleted;
     private final java.lang.management.ThreadMXBean scanMeter=java.lang.management.ManagementFactory.getThreadMXBean();
     private boolean scanWallFallback;
-    private int cacheX,cacheZ,segmentX=Integer.MIN_VALUE,segmentY,segmentZ;
-    private FrozenChunk cachedChunk,segmentChunk;
+    private int segmentX=Integer.MIN_VALUE,segmentY,segmentZ;
+    private long[] lookupKeys;private boolean[] lookupValid;private FrozenChunk[] lookupValues;
+    private FrozenChunk segmentChunk;
     private boolean segmentCandidate,segmentOccluded;
     @Override public boolean scanning(){return capturedAll && sectionChunks==null && !addingEntities && building==null && result==null && y<=y1;}
     private long scanCpu(){return scanMeter.isCurrentThreadCpuTimeSupported() && scanMeter.isThreadCpuTimeEnabled()?scanMeter.getCurrentThreadCpuTime():-1;}
@@ -150,7 +156,8 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
         if(!inputsCurrent.getAsBoolean())throw new IllegalStateException("场景输入在准备期间更新");
         if(com.wenkrang.famara.compat.CeCompat.visualEpoch()!=visual.epoch())throw new IllegalStateException("世界快照期间CE视觉代已变化，未混用映射");
         if(!capturedAll && pendingChunks==null) {
-            if(global!=null && memory==null){memory=new com.wenkrang.famara.render.schedule.MemoryScope(global,"photo-workspace",sceneWorkspaceBytes());memory.claim(256L+candidateBits.size()/8L);}
+            if(global!=null && memory==null){memory=com.wenkrang.famara.render.schedule.MemoryScope.incremental(global,"photo-workspace",sceneWorkspaceBytes());memory.claim(256L+candidateBits.size()/8L);}
+            if(lookupKeys==null){if(memory!=null)memory.claim(1280);lookupKeys=new long[64];lookupValid=new boolean[64];lookupValues=new FrozenChunk[64];}
             if(occlusionEnabled){if(memory!=null)memory.claim(ConservativeOcclusion.estimatedBytes(settings.samples()));occlusion=new ConservativeOcclusion(camera,settings.samples(),settings.distance());}
             Set<ChunkCaptureService.Coordinate> chunkSet=new LinkedHashSet<>();
             int chunkHalo=Math.max(1,(modelHalo+16)/16);
@@ -169,7 +176,7 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
             }
             if(converting!=null) {
                 if(!converting.step(operations,deadline))return CpuPhotoPipeline.PreparationStep.CONTINUE;
-                frozen.put(convertingChunk,converting.result());frozenPeak=Math.max(frozenPeak,frozen.values().stream().mapToLong(FrozenChunk::retainedBytes).sum());converting.close();converting=null;consumeCurrent();
+                frozen.put(convertingChunk,converting.result());Arrays.fill(lookupValid,false);Arrays.fill(lookupValues,null);frozenPeak=Math.max(frozenPeak,frozen.values().stream().mapToLong(FrozenChunk::retainedBytes).sum());converting.close();converting=null;consumeCurrent();
                 if(occlusion!=null){occlusion.beginUpdate();updatingOcclusion=true;}
                 return CpuPhotoPipeline.PreparationStep.CONTINUE;
             }
@@ -198,8 +205,13 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
                 rawPeak=Math.max(rawPeak,request.reservedBytes());waitingSince=System.nanoTime();
                 request.result().whenComplete((ready,error)->{if(!closed)wakeup.run();});return CpuPhotoPipeline.PreparationStep.WAITING;
             }
+            if(actorsReady==null){actorsReady=streamingExtras==null?java.util.concurrent.CompletableFuture.completedFuture(List.of()):streamingExtras.finishActors(occlusion).toCompletableFuture();actorsReady.whenComplete((value,error)->{if(!closed)wakeup.run();});}
+            if(!actorsReady.isDone())return CpuPhotoPipeline.PreparationStep.WAITING;
+            var actors=actorsReady.join();actorIterator=actors.iterator();
+            if(streamingExtras!=null){actorResources=streamingExtras.transferActorResources();actorMetadata=streamingExtras.actorMetadata();}
             capturedAll=true;pendingChunks=null;closeExtras();world=null;
             builder=new SceneSnapshot.Builder(lease.generation(),info.minHeight,info.maxHeight,limits.maximumInstances,limits.maximumIndexEntries).memory(memory);
+            if(actorResources!=null)builder.actorResources(actorResources);
             if(lodPolicy.enabled())farLod=new FarLod(camera,settings,lodPolicy,lease.generation(),memory);
             occludedChunks.forEach(c->builder.occludedChunk(c.x(),c.z()));
             entityIterator=java.util.stream.Stream.concat(frozen.values().stream().flatMap(c->c.entities().stream()),metadataEntities.stream()).iterator();addingEntities=true;
@@ -223,10 +235,14 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
             }
             return CpuPhotoPipeline.PreparationStep.CONTINUE;
         }
+        if(actorIterator!=null) {
+            for(int n=0;n<Math.min(operations,8) && System.nanoTime()<deadline;n++){if(!actorIterator.hasNext()){actorIterator=null;break;}builder.actor(actorIterator.next(),info.hasSkyLight?info.skyDarken:15);livingActorCount++;}
+            return CpuPhotoPipeline.PreparationStep.CONTINUE;
+        }
         if(building!=null) {
             if(!building.step(operations,deadline,System::nanoTime))return CpuPhotoPipeline.PreparationStep.CONTINUE;
             Map<String,String> metadata=new HashMap<>();
-            metadata.put("world",info.id.toString());metadata.put("visualEpoch",Long.toString(visual.epoch()));
+            metadata.putAll(actorMetadata);metadata.put("actorSkinTextures",Long.toString(building.result().actorSkinTextures()));metadata.put("livingActors",Integer.toString(livingActorCount));metadata.put("world",info.id.toString());metadata.put("visualEpoch",Long.toString(visual.epoch()));
             metadata.put("captureStartedNanos",Long.toString(captureStart==Long.MAX_VALUE?0:captureStart));metadata.put("captureCompletedNanos",Long.toString(captureEnd));
             metadata.put("scannedCells",Long.toString(scanned));metadata.put("candidateCells",Long.toString(candidateCells));metadata.put("skippedCells",Long.toString(skippedCells));
             metadata.put("culledHosts",Long.toString(culled));metadata.put("occludedHosts",Long.toString(occludedHosts));metadata.put("skippedBlockSnapshots",Integer.toString(occludedChunks.size()));metadata.put("entities","LEGACY_ENTITY_APPROXIMATION:"+entityCount);
@@ -236,7 +252,7 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
             metadata.put("frozenPeakBytes",Long.toString(frozenPeak));metadata.put("lodGroups",Long.toString(lodGroups));metadata.put("lodHiddenGroups",Long.toString(lodHidden));metadata.put("capturedChunks",Integer.toString(completedChunks));metadata.put("indexBytes",Long.toString(building.result().indexBytes()));metadata.put("sceneInstances",Integer.toString(building.result().instances().size()));metadata.put("indexSections",Integer.toString(building.result().indexSections()));
             var mesh=building.progress();metadata.put("fluidCount",Long.toString(mesh.fluids()));metadata.put("fluidTriangles",Long.toString(mesh.triangles()));metadata.put("fluidRetainedBytes",Long.toString(mesh.retainedBytes()));
             if(memory!=null){metadata.put("workspacePeak",Long.toString(memory.peak()));metadata.put("preparationWorkspacePeak",Long.toString(memory.peak()));}
-            result=new CpuPhotoPipeline.Prepared(building.result(),camera,settings,palette,lease,metadata,memory);
+            result=new CpuPhotoPipeline.Prepared(building.result(),camera,settings,palette,lease,metadata,memory);actorResources=null;
             frozen.values().forEach(FrozenChunk::close);frozen.clear();states.clear();builder=null;building=null;
             return CpuPhotoPipeline.PreparationStep.DONE;
         }
@@ -283,7 +299,7 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
         }
         }finally{long end=scanCpu();scanWallNanos+=Math.max(0,System.nanoTime()-wall);if(cpu>=0 && end>=cpu)scanCpuNanos+=end-cpu;else{scanWallFallback=true;scanCpuNanos+=Math.max(0,System.nanoTime()-wall);}}
         if(y>y1) {
-            scanCompleted=System.nanoTime();cachedChunk=null;segmentChunk=null;
+            scanCompleted=System.nanoTime();Arrays.fill(lookupValid,false);Arrays.fill(lookupValues,null);segmentChunk=null;
             // 流体/剔面/光照需要的邻域已复制到builder，紧凑世界的最后消费者已退出。
             frozen.values().forEach(FrozenChunk::close);frozen.clear();
             if(farLod!=null){lodGroups=farLod.groups();lodHidden=farLod.hiddenGroups();farLod.close();farLod=null;}
@@ -377,9 +393,11 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
         if(y<info.minHeight || y>=info.maxHeight)return false;FrozenChunk chunk=findChunk(x,z);return chunk!=null && chunk.matches(x&15,y,z&15,expected);
     }
     private FrozenChunk findChunk(int x,int z) {
-        int cx=x>>4,cz=z>>4;if(cachedChunk!=null && cacheX==cx && cacheZ==cz)return cachedChunk;
+        int cx=x>>4,cz=z>>4,mixed=cx*0x9E3779B9+cz*0x85EBCA6B;mixed^=mixed>>>16;int slot=mixed&63;
+        long key=((long)cx<<32)^(cz&0xffffffffL);
+        if(lookupValid[slot] && lookupKeys[slot]==key)return lookupValues[slot];
         FrozenChunk value=frozen.get(new ChunkCaptureService.Coordinate(cx,cz));
-        if(value!=null){cacheX=cx;cacheZ=cz;cachedChunk=value;}return value;
+        lookupKeys[slot]=key;lookupValues[slot]=value;lookupValid[slot]=true;return value;
     }
     private FrozenChunk chunk(int x,int z) {
         FrozenChunk value=findChunk(x,z);if(value==null)throw new SceneException(SceneException.Code.SCENE_INCOMPLETE,"没有捕获所需区块："+(x>>4)+","+(z>>4));return value;
@@ -404,7 +422,8 @@ public final class WorldPreparation implements CpuPhotoPipeline.Preparation {
         try{resource.close();}catch(Throwable error){if(failure==null)failure=error;else if(failure!=error)failure.addSuppressed(error);}return failure;
     }
     @Override public void close() {
-        if(closed)return;closed=true;cachedChunk=null;segmentChunk=null;Throwable failure=null;
+        if(closed)return;closed=true;lookupKeys=null;lookupValid=null;lookupValues=null;segmentChunk=null;Throwable failure=null;
+        failure=closeResource(failure,actorResources);actorResources=null;actorIterator=null;actorsReady=null;
         failure=closeResource(failure,tableMemory);tableMemory=null;world=null;
         if(extras instanceof AutoCloseable owned)failure=closeResource(failure,owned);extras=null;entityIterator=null;
         failure=closeResource(failure,farLod);farLod=null;

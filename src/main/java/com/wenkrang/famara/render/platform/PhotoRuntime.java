@@ -30,11 +30,16 @@ public final class PhotoRuntime implements AutoCloseable {
     private static volatile long startup;
     private final JavaPlugin plugin;
     private final TexturedConfiguration config;
+    private final com.wenkrang.famara.render.gpu.RenderBackendPolicy backendPolicy;
+    private final com.wenkrang.famara.render.gpu.CpuPhotoRenderBackend cpuBackend;
+    private final com.wenkrang.famara.render.gpu.GpuDeviceProbe gpuProbe;
+    private final com.wenkrang.famara.render.gpu.OpenClPhotoRenderer gpuBackend;
     private final RenderMemoryBudget memory;
     private final RenderMemoryBudget.Lease platformMemory;
     private final RenderMemoryBudget.Lease businessMemory;
     private final CpuBudget cpu;
     private final BudgetedWorkRunner io;
+    private final ActorAssets actorAssets;
     private final AssetRepository assets;
     private final BudgetedAssetLoader loader;
     private final CeVisualResourceService visuals;
@@ -85,6 +90,14 @@ public final class PhotoRuntime implements AutoCloseable {
         if(mode==Mode.TEXTURED){cpu.reconfigure(config.loading().cpuMillisPerSecond(),config.loading().burstMillis());startupBoost.set(true);}
         CeCompat.loadingBudget(cpu,config.assetBuild());CeCompat.memoryBudget(memory);
         io=new BudgetedWorkRunner(config.io().maximum(),config.io().intervalNanos(),config.io().quantumNanos(),cpu);
+        actorAssets=new ActorAssets(memory,io,cpu);actorAssets.base(config.base(com.wenkrang.famara.lib.DataFolders.of(plugin).toPath()));
+        cpuBackend=new com.wenkrang.famara.render.gpu.CpuPhotoRenderBackend(io);
+        var effectiveGpu=mode==Mode.TEXTURED?config.gpu():com.wenkrang.famara.render.gpu.GpuConfiguration.disabled();
+        gpuProbe=new com.wenkrang.famara.render.gpu.GpuDeviceProbe(effectiveGpu,cpu,memory,com.wenkrang.famara.lib.DataFolders.of(plugin).toPath().resolve("gpu-device.lock"));
+        gpuBackend=new com.wenkrang.famara.render.gpu.OpenClPhotoRenderer(gpuProbe,effectiveGpu,memory,io);
+        backendPolicy=new com.wenkrang.famara.render.gpu.RenderBackendPolicy(config.gpu(),()->gpuBackend.capabilities().available());
+        if(effectiveGpu.mode()!=com.wenkrang.famara.render.gpu.GpuConfiguration.Mode.OFF)
+            gpuProbe.initialization().whenComplete((status,error)->plugin.getLogger().info("V2 GPU设备初始化："+(error==null?status:reason(error))));
         assets=new AssetRepository(config.cache().generations(),config.cache().retainedBytes());loader=new BudgetedAssetLoader(assets,config.assets(),config.assetBuild(),cpu,memory);
         visuals=new CeVisualResourceService(config.base(com.wenkrang.famara.lib.DataFolders.of(plugin).toPath()),config.assets(),config.visuals(),assets,loader,io,cpu,error->{finishBoost("资源准备失败");plugin.getLogger().log(java.util.logging.Level.WARNING,"V2视觉资源未就绪："+reason(error),error);}).memory(memory);
         biomes=new BiomeCatalog(config.biomes(),cpu);capture=new ChunkCaptureService(config.capture(),cpu,memory);
@@ -115,9 +128,10 @@ public final class PhotoRuntime implements AutoCloseable {
             if(render && config.bundledBase()) {
                 var source=BundledBaseResources.prepare(plugin.getClass().getClassLoader(),com.wenkrang.famara.lib.DataFolders.of(plugin).toPath(),memory,()->!closed);
                 if(!source.manifest().clientVersion().equals(config.resourceVersion()))throw new IllegalStateException("内置资源版本与resourceVersion不一致");
-                if(closed)throw new CancellationException("基础源准备后插件已关闭");visuals.base(source.path(),source.manifest().zipSha256());
+                if(closed)throw new CancellationException("基础源准备后插件已关闭");visuals.base(source.path(),source.manifest().zipSha256());actorAssets.base(source.path());
                 plugin.getLogger().info("V2内置基础资源已就绪："+source.manifest().clientVersion()+"，SHA256="+source.manifest().zipSha256()+"，无需外置客户端JAR");
             }
+            if(render){var actorSource=BundledActorResources.prepare(PhotoRuntime.class.getClassLoader(),com.wenkrang.famara.lib.DataFolders.of(plugin).toPath(),memory,()->!closed);actorAssets.base(actorSource.path());actorAssets.prepare();}
             return null;
         })).whenComplete((ignored,error)->{
             if(error!=null) {
@@ -127,7 +141,7 @@ public final class PhotoRuntime implements AutoCloseable {
                 unavailable=reason(error);startupFailure=unavailable;finishBoost("基础资源/存储初始化失败");plugin.getLogger().severe("V2初始化未完成："+unavailable);return;
             }
             if(closed)return;
-            synchronized(this){if(closed)return;pipeline=render?new CpuPhotoPipeline(config.pipeline(),store,this::publish,cpu):null;}
+            synchronized(this){if(closed)return;pipeline=render?new CpuPhotoPipeline(config.pipeline(),store,this::publish,cpu,config.gpu(),gpuBackend):null;}
             Sched.global(()->{
                 if(closed)return;
                 if(render) {
@@ -200,6 +214,7 @@ public final class PhotoRuntime implements AutoCloseable {
         } catch(RuntimeException error){player.sendMessage("§c照片操作失败，未替换物品："+reason(error));return true;}
     }
     private void take(Player player,ItemStack held) {
+        backendPolicy.requireCpuAllowed();
         if(!releases.isEmpty())throw new IllegalStateException("故障预约正在释放，未受理新拍摄");
         held=synchronize(held);int film=ItemUtils.rawFilmAmount(held);if(film<=0){player.sendMessage("§c相机没有胶卷");return;}
         ItemMeta meta=held.getItemMeta();CameraIdentity.Account account=CameraIdentity.assign(meta);held.setItemMeta(meta);
@@ -216,7 +231,9 @@ public final class PhotoRuntime implements AutoCloseable {
                     config.allowVanillaCe().stream().map(ResourceKey::parse).collect(java.util.stream.Collectors.toUnmodifiableSet()),
                     biome.resolver(generation));
             preparation.memory(memory);preparation.window(config.capture().windowChunks());preparation.lod(config.lod());preparation.occlusion(config.memory().occlusion());preparation.guard(biome::current);
-            preparation.extras(new LegacyEntityCapture(input.table().epoch(),config.entities(),camera.origin(),config.shot().distance()));
+            var actorBatch=actorAssets.batch();
+            try{preparation.extras(new LivingEntityCapture(plugin,new LegacyEntityCapture(input.table().epoch(),config.entities(),camera.origin(),config.shot().distance()),actorBatch,world.getUID(),player.getUniqueId(),camera,config.shot().distance()));}
+            catch(RuntimeException | Error error){actorBatch.close();throw error;}
             ItemStack pendingCamera=ItemSystem.get("camera_filmed");CameraIdentity.copy(held,pendingCamera,false);
             pendingCamera=ItemUtils.writeRawFilm(pendingCamera,film);ItemMeta pendingMeta=pendingCamera.getItemMeta();
             CameraIdentity.request(pendingMeta,run.id);List<String> pendingLore=new ArrayList<>(Objects.requireNonNull(pendingMeta.getLore()));
@@ -382,8 +399,8 @@ public final class PhotoRuntime implements AutoCloseable {
     private static String reason(Throwable error){while((error instanceof CompletionException || error instanceof ExecutionException) && error.getCause()!=null)error=error.getCause();return error.toString();}
     public static void stop(){startup++;PhotoRuntime runtime=current;current=null;if(runtime!=null)runtime.close();}
     @Override public synchronized void close() {
-        if(closed)return;closed=true;finishBoost("服务关闭");if(reloadListener!=null)org.bukkit.event.HandlerList.unregisterAll(reloadListener);if(maintenance!=null)maintenance.cancel();visuals.close();biomes.close();capture.close();loader.close();
-        if(pipeline!=null)pipeline.close();assets.close();claims.clear();frames.close();
+        if(closed)return;closed=true;finishBoost("服务关闭");if(reloadListener!=null)org.bukkit.event.HandlerList.unregisterAll(reloadListener);if(maintenance!=null)maintenance.cancel();visuals.close();biomes.close();capture.close();loader.close();actorAssets.close();
+        if(pipeline!=null)pipeline.close();gpuBackend.close();gpuProbe.close();gpuProbe.whenClosed().whenComplete((ignored,error)->{if(error!=null)plugin.getLogger().log(java.util.logging.Level.WARNING,"GPU资源释放失败",error);});cpuBackend.close();assets.close();claims.clear();frames.close();
         // 结算已在IO串行队列中排在关闭之前；不在游戏线程join或进行文件操作。
         try{io.submit(()->checked(()->{if(ledger!=null)ledger.close();businessMemory.close();platformMemory.close();return null;})).whenComplete((v,e)->io.close());}
         catch(RejectedExecutionException error){io.closeAfter(()->checked(()->{if(ledger!=null)ledger.close();businessMemory.close();platformMemory.close();return null;}));}

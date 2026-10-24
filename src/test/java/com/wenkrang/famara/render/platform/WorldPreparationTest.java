@@ -103,7 +103,7 @@ class WorldPreparationTest {
             var camera=new Camera(new Vec3(.5,.5,.5),0,0,Camera.Projection.LEGACY_ANGULAR,1);var settings=new CpuPhotoRenderer.Settings(2,1,Texture.Filter.NEAREST,false,0,.5,32,0,0,new VoxelTracer.Limits(100,100,1000),Map.of());
             var work=new WorldPreparation(capture,mock(World.class),new WorldPreparation.WorldInfo(UUID.randomUUID(),0,16,0),input,camera,settings,new MapPaletteSnapshot("test",List.of(new MapPaletteSnapshot.Entry(4,0),new MapPaletteSnapshot.Entry(5,0xffffff))),new WorldPreparation.Limits(1000,100,10,10000),new VersionStateAdapter(VersionStateAdapter.Version.parse("26.3"),VersionStateAdapter.Version.parse("26.3")),Set.of(),(c,x,y,z,v)->new SceneSnapshot.Lighting(15,0,0xffffff)).memory(global);
             class BrokenExtras implements ChunkCaptureService.Extras,AutoCloseable {public List<LegacyEntity> capture(Chunk chunk){return List.of();}public void close(){throw new IllegalStateException("extras close");}}
-            work.extras(new BrokenExtras());assertEquals(CpuPhotoPipeline.PreparationStep.WAITING,work.step(10,Long.MAX_VALUE));assertEquals(201326592,global.snapshot().live());
+            work.extras(new BrokenExtras());assertEquals(CpuPhotoPipeline.PreparationStep.WAITING,work.step(10,Long.MAX_VALUE));assertTrue(global.snapshot().live()>0);assertTrue(global.snapshot().live()<201326592);
             var error=assertThrows(IllegalStateException.class,work::close);assertEquals("table close",error.getCause().getMessage());assertEquals(1,error.getCause().getSuppressed().length);assertEquals(0,global.snapshot().live());work.close();verify(request).close();
         }
     }

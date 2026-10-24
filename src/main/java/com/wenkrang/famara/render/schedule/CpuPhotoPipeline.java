@@ -2,6 +2,7 @@ package com.wenkrang.famara.render.schedule;
 
 import com.wenkrang.famara.render.asset.*;
 import com.wenkrang.famara.render.kernel.*;
+import com.wenkrang.famara.render.gpu.*;
 import com.wenkrang.famara.render.scene.SceneSnapshot;
 import com.wenkrang.famara.render.output.*;
 
@@ -31,11 +32,12 @@ public final class CpuPhotoPipeline implements AutoCloseable {
     }
 
     public record Prepared(SceneSnapshot scene, Camera camera, CpuPhotoRenderer.Settings settings,
-                           MapPaletteSnapshot palette, AssetRepository.Lease lease,Map<String,String> sourceMetadata,MemoryScope memory) {
+                           MapPaletteSnapshot palette, AssetRepository.Lease lease,Map<String,String> sourceMetadata,MemoryScope memory) implements AutoCloseable {
         public Prepared(SceneSnapshot scene,Camera camera,CpuPhotoRenderer.Settings settings,MapPaletteSnapshot palette,AssetRepository.Lease lease,Map<String,String> metadata){this(scene,camera,settings,palette,lease,metadata,null);}
         public Prepared(SceneSnapshot scene,Camera camera,CpuPhotoRenderer.Settings settings,MapPaletteSnapshot palette,AssetRepository.Lease lease) {
             this(scene,camera,settings,palette,lease,Map.of(),null);
         }
+        @Override public void close(){try{scene.close();}finally{lease.close();}}
         public Prepared {
             Objects.requireNonNull(scene);
             Objects.requireNonNull(camera);
@@ -94,9 +96,9 @@ public final class CpuPhotoPipeline implements AutoCloseable {
 
         public int mapId(){return context.mapId;}
         public PreparationProgress preparationProgress(){return context.progress;}
-        public String progressMessage(){var stage=context.state.state().stage();return stage==PhotoJobState.Stage.CAPTURING?"CAPTURING · "+context.progress.message():stage==PhotoJobState.Stage.RENDERING?"RENDERING · "+completedPixels()+"/16384，渲染路数 "+(context.lanes==null?0:context.lanes.length):stage.toString();}
+        public String progressMessage(){var stage=context.state.state().stage();return stage==PhotoJobState.Stage.CAPTURING?"CAPTURING · "+context.progress.message():stage==PhotoJobState.Stage.RENDERING?"RENDERING · "+completedPixels()+"/16384"+(context.gpuPlanned?"":"，渲染路数 "+(context.lanes==null?0:context.lanes.length)):stage.toString();}
         public String diagnostics(){return context.diagnostics();}
-        public int completedPixels(){WorkToken[] lanes=context.lanes;if(lanes==null)return 0;int pixels=0;for(var lane:lanes)pixels+=lane.cursor.completedPixels();return pixels;}
+        public int completedPixels(){if(context.gpuValue!=null)return 16384;WorkToken[] lanes=context.lanes;if(lanes==null)return 0;int pixels=0;for(var lane:lanes)pixels+=lane.cursor.completedPixels();return pixels;}
         public int peakRenderLanes(){return context.peakRenderLanes;}
         public long renderWallNanos(){return context.renderFinished==0?0:context.renderFinished-context.renderStarted;}
         public long renderCpuNanos(){return context.renderCpu.get();}
@@ -148,16 +150,27 @@ public final class CpuPhotoPipeline implements AutoCloseable {
         final Object scheduling=new Object();
         final WorkToken control;
         volatile WorkToken[] lanes;
-        boolean lanesActivated;
+        boolean lanesActivated,gpuStarted,gpuCompleted,gpuFallback;
+        volatile boolean gpuPlanned;
+        volatile UUID gpuRequest;
+        volatile PhotoRenderBackend.Result gpuValue;
+        Throwable gpuError;
+        volatile Map<String,String> gpuMetadata=Map.of();
+        volatile String fallbackReason=backendPolicy.fallbackReason();
+        final AtomicBoolean gpuDelivered=new AtomicBoolean();
         volatile int activeRenderLanes,peakRenderLanes;
         volatile long renderStarted,renderFinished;
+        long cpuRenderStarted,gpuAttemptCpu,gpuQueuedAt,gpuQueueNanos;
+        GpuAutoPolicy.Input autoInput;
+        GpuAutoPolicy.Decision decision;
+        String backendDecision="CPU_DEFAULT";
         final AtomicLong renderCpu=new AtomicLong();
         final long deadline, reservedBytes;
         final long started=System.nanoTime();
         volatile long captureStarted,captureFinished;
         final AtomicLong preparationCpu=new AtomicLong();
         volatile PreparationProgress progress=new PreparationProgress("等待拍摄预约",0,0,"");
-        String diagnostics(){return "request="+id+"，stage="+state.state().stage()+"，最后子阶段="+progress.message()+"，wallMs="+(System.nanoTime()-started)/1000000+"，cpuMs="+cpuNanos.get()/1000000+"，captureCpuMs="+preparationCpu.get()/1000000;}
+        String diagnostics(){return "request="+id+"，stage="+state.state().stage()+"，最后子阶段="+progress.message()+"，wallMs="+(System.nanoTime()-started)/1000000+"，cpuMs="+cpuNanos.get()/1000000+"，captureCpuMs="+preparationCpu.get()/1000000+"，backend="+(renderStarted==0?"UNSELECTED":gpuPlanned?"OPENCL":"CPU")+"，decision="+backendDecision+"，gpuMode="+backendPolicy.requested()+"，gpuDevice="+gpuMetadata.getOrDefault("gpuDevice","UNUSED")+"，fallbackReason="+fallbackReason+"，serialize/upload/kernel/readbackMs="+gpuMetadata.getOrDefault("serializeMs","0")+"/"+gpuMetadata.getOrDefault("uploadMs","0")+"/"+gpuMetadata.getOrDefault("kernelMs","0")+"/"+gpuMetadata.getOrDefault("readbackMs","0")+"，renderCpuNanos="+renderCpu.get()+"，vramPeak="+gpuMetadata.getOrDefault("vramPeak","0");}
         final PhotoJobState state = new PhotoJobState();
         final CompletableFuture<Result> result = new CompletableFuture<>();
         final AdmissionController.Permit permit;
@@ -198,6 +211,7 @@ public final class CpuPhotoPipeline implements AutoCloseable {
         void settlementFailed(Throwable failure){synchronized(scheduling){settling=false;}finishFailure(failure);}
         void finishFailure(Throwable failure) {
             synchronized(scheduling){if(settling && !state.state().stage().terminal())return;if(this.failure==null)this.failure=failure;state.fail(this.failure.toString());}
+            UUID nativeRequest=gpuRequest;if(nativeRequest!=null && gpuBackend!=null)gpuBackend.cancel(nativeRequest);
             queue.remove(control.id);WorkToken[] group=lanes;if(group!=null)for(var lane:group)queue.remove(lane.id);
             cleanup();
         }
@@ -207,13 +221,14 @@ public final class CpuPhotoPipeline implements AutoCloseable {
             synchronized(scheduling) {
                 if(!state.state().stage().terminal() || running.get()!=0 || !cleaned.compareAndSet(false,true))return;
             }
+            synchronized(gpuQueueLock){gpuWaiting.remove(this);}
             Prepared owned=prepared;prepared=null;
             Preparation pending=preparation;preparation=null;
-            try { if(owned!=null)owned.lease.close(); }
+            try { if(owned!=null)owned.close(); }
             catch(Throwable error){recordCleanup(error);}
             try { if(pending!=null)pending.close(); }
             catch(Throwable error){recordCleanup(error);}
-            lanes=null;
+            lanes=null;gpuValue=null;
             try{if(memory!=null)memory.close();}catch(Throwable error){recordCleanup(error);}finally{memory=null;permit.close();}
             synchronized (submissions) {
                 jobs.remove(id,this);
@@ -237,6 +252,13 @@ public final class CpuPhotoPipeline implements AutoCloseable {
     private final RenderProbe probe;
     @FunctionalInterface interface RendererFactory {CpuPhotoRenderer create(SceneSnapshot scene,Camera camera,CpuPhotoRenderer.Settings settings);}
     private final RendererFactory rendererFactory;
+    private final RenderBackendPolicy backendPolicy;
+    private final GpuConfiguration gpuConfig;
+    private final PhotoRenderBackend gpuBackend;
+    private final Object gpuQueueLock=new Object();
+    private final ArrayDeque<Context> gpuWaiting=new ArrayDeque<>();
+    private Context gpuOwner;
+    private final GpuAutoPolicy autoPolicy=new GpuAutoPolicy();
     public CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher) {
         this(limits,store,publisher,new CpuBudget(limits.cpuMillisPerSecond,limits.burstMillis,System::nanoTime));
     }
@@ -244,10 +266,24 @@ public final class CpuPhotoPipeline implements AutoCloseable {
     public CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget) {
         this(limits,store,publisher,sharedBudget,(request,lane)->{});
     }
+    public CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget,com.wenkrang.famara.render.gpu.GpuConfiguration gpu) {
+        this(limits,store,publisher,sharedBudget,(request,lane)->{},com.wenkrang.famara.render.gpu.CpuPhotoRenderBackend::referenceRenderer,gpu);
+    }
+    public CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget,GpuConfiguration gpu,PhotoRenderBackend gpuBackend) {
+        this(limits,store,publisher,sharedBudget,(request,lane)->{},CpuPhotoRenderBackend::referenceRenderer,gpu,gpuBackend);
+    }
     CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget,RenderProbe probe) {
-        this(limits,store,publisher,sharedBudget,probe,CpuPhotoRenderer::new);
+        this(limits,store,publisher,sharedBudget,probe,com.wenkrang.famara.render.gpu.CpuPhotoRenderBackend::referenceRenderer);
     }
     CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget,RenderProbe probe,RendererFactory rendererFactory) {
+        this(limits,store,publisher,sharedBudget,probe,rendererFactory,com.wenkrang.famara.render.gpu.GpuConfiguration.disabled());
+    }
+    private CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget,RenderProbe probe,RendererFactory rendererFactory,com.wenkrang.famara.render.gpu.GpuConfiguration gpu) {
+        this(limits,store,publisher,sharedBudget,probe,rendererFactory,gpu,null);
+    }
+    private CpuPhotoPipeline(Limits limits,DiskPhotoStore store,Publisher publisher,CpuBudget sharedBudget,RenderProbe probe,RendererFactory rendererFactory,GpuConfiguration gpu,PhotoRenderBackend gpuBackend) {
+        this.gpuConfig=Objects.requireNonNull(gpu);this.gpuBackend=gpuBackend;
+        backendPolicy=new RenderBackendPolicy(gpu,()->gpuBackend!=null && gpuBackend.capabilities().available());
         this.probe=Objects.requireNonNull(probe);this.rendererFactory=Objects.requireNonNull(rendererFactory);
         this.limits = Objects.requireNonNull(limits);batchPixels=limits.batchPixels;
         this.store = Objects.requireNonNull(store);
@@ -289,6 +325,7 @@ public final class CpuPhotoPipeline implements AutoCloseable {
         return submitInternal(player,request,-1,memoryReservation,prepare);
     }
     private Handle submitInternal(UUID player,UUID request,int mapId,long memoryReservation,Preparation prepare) {
+        backendPolicy.requireCpuAllowed();
         Objects.requireNonNull(player);
         Objects.requireNonNull(request);
         Objects.requireNonNull(prepare);
@@ -349,8 +386,9 @@ public final class CpuPhotoPipeline implements AutoCloseable {
             token.running=false;context.running.decrementAndGet();
             try{if(context.valid()) {
                 if(token.lane<0 && context.state.state().stage()==PhotoJobState.Stage.RENDERING) {
-                    context.lanesActivated=true;context.renderStarted=System.nanoTime();
-                    for(var lane:context.lanes)if(!offer(lane)){context.finishFailure(new RejectedExecutionException("渲染分片队列已满"));break;}
+                    context.lanesActivated=true;if(context.renderStarted==0)context.renderStarted=System.nanoTime();
+                    if(context.gpuPlanned){if(!context.gpuStarted)startGpu(context);}
+                    else{if(context.cpuRenderStarted==0)context.cpuRenderStarted=System.nanoTime();for(var lane:context.lanes)if(!offer(lane)){context.finishFailure(new RejectedExecutionException("渲染分片队列已满"));break;}}
                 } else if(token.lane>=0) {
                     if(!token.done && !offer(token))context.finishFailure(new RejectedExecutionException("渲染分片无法重新入队"));
                     if(context.valid() && context.running.get()==0 && Arrays.stream(context.lanes).allMatch(lane->lane.done && !lane.queued && !lane.running)) {
@@ -383,6 +421,10 @@ public final class CpuPhotoPipeline implements AutoCloseable {
                 }
             }
             if(timeout!=null)context.finishFailure(timeout);
+            synchronized(context.scheduling) {
+                if(context.valid() && context.lanesActivated && context.gpuPlanned && !context.gpuStarted
+                        && context.state.state().stage()==PhotoJobState.Stage.RENDERING)startGpu(context);
+            }
         }
         if (!slots.tryAcquire()) return;
         Optional<CpuBudget.Reservation> reservation = budget.reserve(limits.quantumCpuNanos);
@@ -474,29 +516,53 @@ public final class CpuPhotoPipeline implements AutoCloseable {
                 if(context.prepared.memory!=null)context.prepared.memory.claim(buffers);
                 required=Math.addExact(required,buffers);
                 if(context.prepared.memory==null && context.reservedBytes<required && !context.permit.grow(required-context.reservedBytes))throw new RejectedExecutionException("渲染分片与输出工作集预约不足");
-                WorkToken[] lanes=new WorkToken[count];
-                for(int lane=0;lane<count;lane++) {
-                    var work=new WorkToken(context,lane);work.renderer=rendererFactory.create(context.prepared.scene,context.prepared.camera,context.prepared.settings);work.cursor=work.renderer.cursor(lane,count);lanes[lane]=work;
+                boolean available=gpuBackend!=null && gpuBackend.capabilities().available();
+                if(gpuConfig.mode()==GpuConfiguration.Mode.AUTO && available) {
+                    context.autoInput=GpuAutoPolicy.inspect(context.prepared.scene,context.prepared.settings,Math.min(2,limits.workers),batchPixels);
+                    context.decision=autoPolicy.select(context.autoInput,gpuConfig,true,gpuBackend.deviceName(),gpuBackend.activeJobs(),gpuBackend.availableHostBytes(),gpuBackend.availableVramBytes());
+                    context.gpuPlanned=context.decision.gpu();context.backendDecision=context.decision.reason();context.fallbackReason=context.gpuPlanned?"":context.decision.reason();
+                }else {
+                    context.gpuPlanned=gpuConfig.mode()==GpuConfiguration.Mode.OPENCL && available;
+                    context.backendDecision=context.gpuPlanned?"FORCED_OPENCL":gpuConfig.mode()==GpuConfiguration.Mode.OFF?"GPU_OFF":"OPENCL_UNAVAILABLE";
+                    if(!available && gpuBackend!=null && gpuBackend.capabilities().unavailableReason().equals("GPU_CIRCUIT_OPEN"))context.backendDecision="GPU_CIRCUIT_OPEN";
+                    if(gpuConfig.mode()!=GpuConfiguration.Mode.OFF)context.fallbackReason=context.gpuPlanned?"":context.backendDecision;
                 }
-                context.lanes=lanes;
+                if(context.gpuPlanned)context.fallbackReason="";
+                else{backendPolicy.requireCpuAllowed();prepareCpuLanes(context);}
                 context.state.advance(PhotoJobState.Stage.PREPARING,PhotoJobState.Stage.READY);
                 context.state.advance(PhotoJobState.Stage.READY,PhotoJobState.Stage.RENDERING);return false;
             }
-            case RENDERING -> {return false;}
+            case RENDERING -> {
+                if(!context.gpuPlanned || !context.gpuCompleted)return false;
+                if(context.gpuError!=null) {
+                    if(!gpuConfig.fallbackToCpu() || context.gpuFallback)throw new CompletionException(context.gpuError);
+                    context.gpuFallback=true;context.gpuPlanned=false;context.gpuValue=null;
+                    context.fallbackReason=fallbackReason(context.gpuError);prepareCpuLanes(context);return false;
+                }
+                context.renderFinished=System.nanoTime();context.state.advance(PhotoJobState.Stage.RENDERING,PhotoJobState.Stage.ENCODING);return true;
+            }
             case ENCODING -> {
                 if(context.mapId<0)return false;
-                int[] rgb=new int[16384];WorkToken[] lanes=context.lanes;
-                for(int lane=0;lane<lanes.length;lane++){int[] pixels=lanes[lane].cursor.copyRgb();for(int i=0;i<pixels.length;i++)rgb[i*lanes.length+lane]=pixels[i];}
+                boolean gpu=context.gpuValue!=null;int[] rgb=gpu?context.gpuValue.rgb():new int[16384];WorkToken[] lanes=context.lanes;
+                if(!gpu)for(int lane=0;lane<lanes.length;lane++){int[] pixels=lanes[lane].cursor.copyRgb();for(int i=0;i<pixels.length;i++)rgb[i*lanes.length+lane]=pixels[i];}
                 Map<String,String> metadata=new HashMap<>(context.prepared.sourceMetadata);
+                if(gpu)metadata.putAll(context.gpuValue.metadata());metadata.putAll(context.gpuMetadata);
+                metadata.put("backend",gpu?"OPENCL":"CPU");metadata.put("gpuQueueNanos",Long.toString(context.gpuQueueNanos));
+                metadata.putIfAbsent("gpuDevice","UNUSED");for(String key:List.of("serializeMs","uploadMs","kernelMs","readbackMs","vramPeak"))metadata.putIfAbsent(key,"0");
+                metadata.put("gpuFallbackCount",context.gpuFallback?"1":"0");metadata.put("backendDecision",context.backendDecision);
+                if(context.decision!=null){metadata.put("estimatedCpuRenderMs",Double.toString(context.decision.cpuMillis()));metadata.put("estimatedGpuRenderMs",Double.toString(context.decision.gpuMillis()));}
+                if(context.autoInput!=null){autoPolicy.observe(context.autoInput,gpu,context.renderFinished-(gpu?context.renderStarted:context.cpuRenderStarted));if(context.gpuFallback)autoPolicy.failed(context.autoInput);}
+                metadata.put("gpuMode",backendPolicy.requested().name());
+                metadata.put("fallbackReason",context.fallbackReason);
                 if(context.memory!=null){metadata.put("workspacePeak",Long.toString(context.memory.peak()));metadata.put("workspaceUsedAtEncode",Long.toString(context.memory.live()));}
-                metadata.put("renderWallNanos",Long.toString(context.renderFinished-context.renderStarted));metadata.put("renderCpuNanos",Long.toString(context.renderCpu.get()));metadata.put("renderLaneCount",Integer.toString(lanes.length));metadata.put("peakRenderLanes",Integer.toString(context.peakRenderLanes));
+                metadata.put("renderWallNanos",Long.toString(context.renderFinished-context.renderStarted));metadata.put("renderCpuNanos",Long.toString(context.renderCpu.get()));metadata.put("renderLaneCount",Integer.toString(gpu?0:lanes.length));metadata.put("peakRenderLanes",Integer.toString(context.peakRenderLanes));
                 metadata.put("captureWallNanos",Long.toString(context.captureFinished-context.captureStarted));
                 metadata.put("preparationCpuNanos",Long.toString(context.preparationCpu.get()));
                 metadata.putAll(Map.of("engine","textured-v2","request",context.id.toString(),"assets",context.assetFingerprint,
                         "palette",context.prepared.palette.version(),"quantizer","linear-euclidean-v1","mode","publisher-port"));
                 ImmutablePhoto photo=new ImmutablePhoto(rgb,context.prepared.palette.quantize(rgb),metadata);
-                Prepared owned=context.prepared;context.prepared=null;owned.lease.close();context.outputOnly=true;
-                context.lanes=null;
+                Prepared owned=context.prepared;context.prepared=null;owned.close();context.outputOnly=true;
+                context.lanes=null;context.gpuValue=null;
                 var token = context.state.beginCommit().orElseThrow(() -> new CancellationException("照片已取消"));
                 DiskPhotoStore.Stored stored = store.commit(context.mapId, photo);
                 if (!context.state.stored(token)) return false;
@@ -513,6 +579,49 @@ public final class CpuPhotoPipeline implements AutoCloseable {
                 return false;
             }
         }
+    }
+
+    private void prepareCpuLanes(Context context) {
+        int count=Math.min(2,limits.workers);WorkToken[] lanes=new WorkToken[count];
+        for(int lane=0;lane<count;lane++){var token=new WorkToken(context,lane);token.renderer=rendererFactory.create(context.prepared.scene,context.prepared.camera,context.prepared.settings);token.cursor=token.renderer.cursor(lane,count);lanes[lane]=token;}
+        context.lanes=lanes;
+    }
+    private void startGpu(Context context) {
+        if(context.gpuStarted || !context.valid())return;
+        if(gpuConfig.mode()==GpuConfiguration.Mode.AUTO) {
+            // Read the backend outside our lock: completion may run under its owner lock.
+            boolean busy=gpuBackend.activeJobs()>0;
+            synchronized(gpuQueueLock) {
+                if(context.gpuQueuedAt==0){context.gpuQueuedAt=System.nanoTime();gpuWaiting.addLast(context);}
+                while(!gpuWaiting.isEmpty() && !gpuWaiting.peekFirst().valid())gpuWaiting.removeFirst();
+                if(busy || gpuOwner!=null || gpuWaiting.peekFirst()!=context)return;
+                gpuWaiting.removeFirst();gpuOwner=context;context.gpuQueueNanos=System.nanoTime()-context.gpuQueuedAt;
+            }
+        }
+        context.gpuStarted=true;context.running.incrementAndGet();
+        try {
+            var prepared=gpuBackend.prepare(context.prepared.scene,context.prepared.camera,context.prepared.settings);context.gpuRequest=prepared.id();
+            gpuBackend.submitAsync(prepared,()->!context.valid()).whenComplete((result,error)->gpuFinished(context,result,error));
+        }catch(Throwable error){gpuFinished(context,null,error);}
+    }
+    private void gpuFinished(Context context,PhotoRenderBackend.Result result,Throwable error) {
+        if(!context.gpuDelivered.compareAndSet(false,true))return;
+        synchronized(gpuQueueLock){if(gpuOwner==context)gpuOwner=null;}
+        if(result==null && error==null)error=new BackendException(BackendException.Code.DEVICE_ERROR,"GPU returned no frame");
+        Map<String,String> diagnostic=Map.of();
+        try{if(context.gpuRequest!=null)diagnostic=Map.copyOf(gpuBackend.diagnostics(context.gpuRequest));}
+        catch(Throwable failure){if(error==null)error=failure;else error.addSuppressed(failure);}
+        long cpu=0;try{cpu=Math.max(0,Long.parseLong(diagnostic.getOrDefault("renderCpuNanos",result==null?"0":result.metadata().getOrDefault("renderCpuNanos","0"))));}catch(NumberFormatException ignored){}
+        synchronized(context.scheduling) {
+            context.gpuValue=result;context.gpuError=error;context.gpuMetadata=diagnostic;context.gpuCompleted=true;
+            context.gpuAttemptCpu=cpu;context.cpuNanos.addAndGet(cpu);context.renderCpu.addAndGet(cpu);context.running.decrementAndGet();
+            if(context.valid() && !offer(context.control))context.finishFailure(new RejectedExecutionException("GPU回执控制队列已满"));
+        }
+        context.cleanup();
+    }
+    private static String fallbackReason(Throwable failure) {
+        while((failure instanceof CompletionException || failure instanceof ExecutionException) && failure.getCause()!=null)failure=failure.getCause();
+        String reason=failure instanceof BackendException backend?backend.code()+": "+backend.getMessage():failure.toString();return reason.substring(0,Math.min(512,reason.length()));
     }
 
     public int pixelLimit(int requested) {

@@ -14,7 +14,8 @@ public record TexturedConfiguration(String baseResources,String resourceVersion,
                                     CeVisualResourceService.Limits visuals,BiomeCatalog.Limits biomes,
                                     ChunkCaptureService.Limits capture,WorldPreparation.Limits preparation,
                                     LegacyEntityCapture.Limits entities,CameraLedger.Limits ledger,Io io,Loading loading,
-                                    Memory memory,Maps maps,com.wenkrang.famara.render.scene.FarLod.Policy lod,CpuPhotoRenderer.Settings shot,List<String> allowVanillaCe) {
+                                    Memory memory,Maps maps,com.wenkrang.famara.render.scene.FarLod.Policy lod,CpuPhotoRenderer.Settings shot,List<String> allowVanillaCe,
+                                    com.wenkrang.famara.render.gpu.GpuConfiguration gpu) {
     public record Memory(long maximumBytes,boolean occlusion) {
         public Memory{if(maximumBytes<=0 || maximumBytes>536870912L)throw new IllegalArgumentException("V2共享总预算必须大于0且不超过512MiB");}
     }
@@ -25,6 +26,7 @@ public record TexturedConfiguration(String baseResources,String resourceVersion,
     }
     public record Maps(int maximumCanvases,int maximumRecoveryRequests,int maximumCachedFrames){public Maps{if(maximumCanvases<=0 || maximumRecoveryRequests<=0 || maximumCachedFrames<=0)throw new IllegalArgumentException("地图限额无效");}}
     public TexturedConfiguration {
+        gpu=gpu==null?com.wenkrang.famara.render.gpu.GpuConfiguration.disabled():gpu;
         lod=lod==null?com.wenkrang.famara.render.scene.FarLod.Policy.disabled():lod;
         Objects.requireNonNull(baseResources);Objects.requireNonNull(resourceVersion);Objects.requireNonNull(assets);Objects.requireNonNull(cache);
         Objects.requireNonNull(assetBuild);Objects.requireNonNull(pipeline);Objects.requireNonNull(visuals);Objects.requireNonNull(biomes);
@@ -65,9 +67,10 @@ public record TexturedConfiguration(String baseResources,String resourceVersion,
         Set<String> keys=new HashSet<>();
         for(var field:type.getRecordComponents()) {
             keys.add(field.getName());JsonElement child=value.get(field.getName());
-            if(child==null && (field.getName().equals("lod") && type==TexturedConfiguration.class || field.getName().equals("scanBatchCpuNanos") && type==CpuPhotoPipeline.Limits.class || field.getName().equals("maximumSourceBytes") && type==BudgetedAssetLoader.Limits.class || field.getName().equals("windowChunks") && type==ChunkCaptureService.Limits.class))continue;
+            if(child==null && ((field.getName().equals("lod") || field.getName().equals("gpu")) && type==TexturedConfiguration.class || field.getName().equals("scanBatchCpuNanos") && type==CpuPhotoPipeline.Limits.class || field.getName().equals("maximumSourceBytes") && type==BudgetedAssetLoader.Limits.class || field.getName().equals("windowChunks") && type==ChunkCaptureService.Limits.class))continue;
             if(child==null || child.isJsonNull())throw new IllegalArgumentException("缺少显式配置："+type.getSimpleName()+"."+field.getName());
             Class<?> childType=field.getType();
+            if(type==com.wenkrang.famara.render.gpu.GpuConfiguration.class && childType==double.class && (!child.isJsonPrimitive() || !child.getAsJsonPrimitive().isNumber()))throw new IllegalArgumentException("GPU配置需要数值："+field.getName());
             if(childType.isRecord())check(child.getAsJsonObject(),childType);
             else if(childType==int.class || childType==long.class || childType==Long.class || childType==Integer.class) {
                 if(!child.isJsonPrimitive() || !child.getAsJsonPrimitive().isNumber())throw new IllegalArgumentException("配置需要整数："+field.getName());

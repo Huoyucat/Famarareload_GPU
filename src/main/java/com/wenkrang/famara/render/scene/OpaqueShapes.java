@@ -8,9 +8,12 @@ import java.util.*;
 public final class OpaqueShapes {
     private OpaqueShapes() {}
     public static boolean fullCube(List<BakedModel> models,AssetGeneration assets) {
+        return fullCube(models,assets::texture);
+    }
+    public static boolean fullCube(List<BakedModel> models,java.util.function.Function<com.wenkrang.famara.render.asset.ResourceKey,com.wenkrang.famara.render.asset.Texture> textures) {
         EnumSet<Direction> covered=EnumSet.noneOf(Direction.class);
         for(BakedModel model:models)for(BakedQuad quad:model.quads()) {
-            if(quad.topology()!=BakedQuad.Topology.QUAD || quad.opacity()!=1 || quad.forceTranslucent() || !assets.texture(quad.texture()).opaque())continue;
+            if(quad.topology()!=BakedQuad.Topology.QUAD || quad.opacity()!=1 || quad.forceTranslucent() || !textures.apply(quad.texture()).opaque())continue;
             Direction face=quad.face();Vec3 n=face.vector();
             if(n.dot(quad.normal())<1-1e-9)continue;
             int axis=Math.abs(n.x())>.5?0:Math.abs(n.y())>.5?1:2;

@@ -33,13 +33,15 @@ class CpuPhotoPipelineTest {
         return repository;
     }
 
-    private CpuPhotoPipeline.Prepared prepare(AssetRepository repository) {
+    private CpuPhotoPipeline.Prepared prepare(AssetRepository repository) {return prepare(repository,null);}
+    private CpuPhotoPipeline.Prepared prepare(AssetRepository repository,AutoCloseable actorResources) {
         var lease = repository.acquire();
         try {
             AssetGeneration g = lease.generation();
             SceneSnapshot.Builder b = new SceneSnapshot.Builder(g, 0, 32, 10, 10000);
             for (int x = -1; x <= 1; x++)
                 for (int z = -1; z <= 1; z++) for (int y = 0; y < 2; y++) b.availableSection(x, y, z);
+            if(actorResources!=null)b.actorResources(actorResources);
             b.put(0, 0, 0, RenderFixtures.vanilla("test:block", g.id()), new SceneSnapshot.Lighting(15, 0, 0xffffff), 0);
             var camera = new Camera(new Vec3(.5, .5, -2), Math.PI / 2, 0, Camera.Projection.PERSPECTIVE, Math.PI / 3);
             var settings = new CpuPhotoRenderer.Settings(8, 1, Texture.Filter.NEAREST, false, 0, .5, 20, 0, 0,
@@ -88,6 +90,22 @@ class CpuPhotoPipelineTest {
                 assertEquals(1, prepared.get());
             }
             assertEquals(1, repository.retainedGenerations());
+        }
+    }
+
+    @Test void actorSceneReservationsAreReleasedBeforePublicationOnSuccessAndFailure()throws Exception {
+        var memory=new RenderMemoryBudget(8L*1024*1024);
+        try(var repository=repository()) {
+            for(boolean reject:List.of(false,true)) {
+                AtomicInteger publications=new AtomicInteger();
+                try(var pipeline=new CpuPhotoPipeline(limits(1),new DiskPhotoStore(directory.resolve(reject?"rejected":"accepted")),(stored,photo,current)->{
+                    assertEquals(0,memory.snapshot().live(),"Actor resources must retire with rendered scene, before disk/publication retains output only");publications.incrementAndGet();return reject?CompletableFuture.failedFuture(new IllegalStateException("publisher failure")):CompletableFuture.completedFuture(null);
+                })) {
+                    var handle=pipeline.submit(UUID.randomUUID(),UUID.randomUUID(),1,8*1024*1024,()->prepare(repository,memory.reserve("actor-scene",1024*1024)));
+                    if(reject)assertThrows(ExecutionException.class,()->handle.result().toCompletableFuture().get(10,TimeUnit.SECONDS));else handle.result().toCompletableFuture().get(10,TimeUnit.SECONDS);
+                    assertEquals(1,publications.get());assertEquals(0,memory.snapshot().live());assertEquals(0,pipeline.admissionSnapshot().admitted());
+                }
+            }
         }
     }
 

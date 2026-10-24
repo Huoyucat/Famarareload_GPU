@@ -6,6 +6,7 @@ import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.*;
+import java.nio.*;
 
 import com.google.gson.*;
 
@@ -80,6 +81,41 @@ public final class Texture {
 
     public int frameCount() {
         return images.size();
+    }
+
+    /** Read-only export contract; no backing array or mutable frame escapes. */
+    public record GpuLayout(int width,int height,int frames,int levels,int timelineEntries,long duration,
+                            boolean interpolate,boolean opaque,boolean fractionalAlpha,long rgbaBytes) {}
+    public GpuLayout gpuLayout(){return new GpuLayout(width,height,images.size(),images.getFirst().size(),timeline.size(),duration,interpolate,opaque,fractionalAlpha,bytes);}
+    /** Level rows: float offset, width, height, reserved. Timeline rows: frame index, duration. */
+    public void copyGpu(FloatBuffer rgba,IntBuffer levels,IntBuffer times) {
+        var cursor=gpuExport(rgba,levels,times);while(!cursor.step(1024,Long.MAX_VALUE,System::nanoTime)){}
+    }
+    public GpuExport gpuExport(FloatBuffer rgba,IntBuffer levels,IntBuffer times){return new GpuExport(rgba,levels,times);}
+    public final class GpuExport {
+        private final FloatBuffer rgba;
+        private final IntBuffer levels,times;
+        private int frame,level,pixel,time;
+        private boolean descriptor;
+        private GpuExport(FloatBuffer rgba,IntBuffer levels,IntBuffer times) {
+        long descriptors=(long)images.size()*images.getFirst().size()*4;
+        if(rgba.remaining()*4L<bytes || levels.remaining()<descriptors || times.remaining()<(long)timeline.size()*2)
+            throw new IllegalArgumentException("Insufficient frozen texture export buffers");
+            this.rgba=rgba;this.levels=levels;this.times=times;
+        }
+        public boolean step(int operations,long deadline,java.util.function.LongSupplier clock) {
+            if(operations<=0)throw new IllegalArgumentException("Positive export quantum required");
+            for(int op=0;op<operations && clock.getAsLong()<deadline;op++) {
+                if(frame<images.size()) {
+                    Level image=images.get(frame).get(level);
+                    if(!descriptor){levels.put(rgba.position()).put(image.width).put(image.height).put(0);descriptor=true;}
+                    int count=Math.min(1024,image.values.length-pixel);rgba.put(image.values,pixel,count);pixel+=count;
+                    if(pixel==image.values.length){pixel=0;descriptor=false;if(++level==images.get(frame).size()){level=0;frame++;}}
+                } else if(time<timeline.size()){Frame entry=timeline.get(time++);times.put(entry.index).put(entry.duration);}
+                else return true;
+            }
+            return frame==images.size() && time==timeline.size();
+        }
     }
 
     public static Texture decode(ResourcePack pack, ResourceKey key, AssetLimits limits) {

@@ -154,7 +154,7 @@ public final class CpuPhotoRenderer {
                 if(hit.instance().farColors()!=null) {
                     Texture.Sample flat=hit.instance().farColors().face(quad.face());r+=transmission*flat.r();g+=transmission*flat.g();b+=transmission*flat.b();transmission=0;continue;
                 }
-                Texture texture = scene.assets().texture(quad.texture());
+                Texture texture = scene.texture(quad.texture());
                 double lod = x < 0 ? 0 : lod(hit, x, y, offsetX, offsetY, texture);
                 Texture.Sample color = texture.sample(hit.u(), hit.v(), lod, settings.animationTicks, settings.filter);
                 if (color.a() <= 0) continue;

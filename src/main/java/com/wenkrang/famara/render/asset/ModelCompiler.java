@@ -16,6 +16,8 @@ public final class ModelCompiler {
     private record Binding(ResourceKey texture, boolean translucent) {
     }
 
+    private java.util.function.Function<ResourceKey,Texture> suppliedTextures;
+    public ModelCompiler(ResourcePack pack,AssetLimits limits,java.util.function.Function<ResourceKey,Texture> textures){this(pack,limits);suppliedTextures=Objects.requireNonNull(textures);}
     private final ResourcePack pack;
     private final AssetLimits limits;
     private final AssetMemoryBudget memory;
@@ -42,7 +44,7 @@ public final class ModelCompiler {
 
     public Texture texture(ResourceKey key) {
         Texture cached=textures.get(key);if(cached!=null)return cached;
-        Texture decoded=Texture.decode(pack,key,limits,memory);
+        Texture decoded=suppliedTextures==null?Texture.decode(pack,key,limits,memory):suppliedTextures.apply(key);
         long next=Math.addExact(decodedBytes,decoded.retainedBytes());
         if(next+allocatedFaces*512>limits.maxTotalBytes())throw new AssetException(AssetException.Code.LIMIT,key.toString(),"累计资产内存超过限额");
         textures.put(key,decoded);decodedBytes=next;return decoded;

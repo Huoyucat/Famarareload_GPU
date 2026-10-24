@@ -188,7 +188,7 @@ public final class ResourcePack {
                 path.startsWith("assets/") && (path.endsWith(".json") || path.endsWith(".png") || path.endsWith(".png.mcmeta"));
     }
 
-    static void validatePath(String path) {
+    public static void validatePath(String path) {
         if (path.isEmpty() || path.indexOf(':') >= 0 || path.indexOf((char) 92) >= 0 || path.indexOf((char) 0) >= 0)
             throw new AssetException(AssetException.Code.INVALID, path, "非法资源路径");
         for (String part : path.split("/", -1))

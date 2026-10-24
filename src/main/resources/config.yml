@@ -8,6 +8,18 @@ render-v2-schema: 11
 # 以下是正式运行默认，不是原离线样例。384MiB仅为快照域，非插件总堆上限。
 # 如果你不清楚这是什么，请不要修改参数。
 render-v2:
+  # GPU策略独立于TEXTURED/LEGACY。实验功能默认关闭，OFF不加载本地绑定。
+  gpu:
+    mode: "OFF"
+    preferredDevice: "Quadro P620"
+    vramBudgetMiB: 384
+    maxConcurrentJobs: 1
+    stagingMemoryMiB: 64
+    textureCacheMiB: 128
+    kernelTimeoutMillis: 10000
+    fallbackToCpu: true
+    # 兼容旧配置；AUTO优先GPU，此阈值不参与后端选择。
+    minEstimatedSpeedup: 1.2
   # V2消费者共用此账本；旧CE取色临时改用独立280MiB（256MiB存活＋24MiB临时），插件合计预约可能超过512MiB。
   # 快照384MiB是V2子上限，不额外叠加。
   memory:

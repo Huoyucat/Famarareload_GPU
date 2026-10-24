@@ -4,11 +4,12 @@ import com.wenkrang.famara.render.asset.*;
 import com.wenkrang.famara.render.math.Vec3;
 
 import java.util.*;
+import java.nio.IntBuffer;
 
 /**
  * 已知 section 与空气分开；几何实例共享模型，不为每格复制网格。
  */
-public final class SceneSnapshot {
+public final class SceneSnapshot implements AutoCloseable {
     public record Cell(int x, int y, int z) {
     }
 
@@ -47,10 +48,14 @@ public final class SceneSnapshot {
     private final List<Instance> instances;
     private final List<LegacyEntity> entities;
     private final long meshBytes;
+    private final Map<ResourceKey,Texture> actorTextures;
+    private final int actorCount;
+    private final AutoCloseable actorResources;
+    private final java.util.concurrent.atomic.AtomicBoolean actorsReleased=new java.util.concurrent.atomic.AtomicBoolean();
     private final Map<Cell,FluidMesher.Cell> neighbors;
 
     private SceneSnapshot(Builder b,Map<Cell,IndexSection> grid,int lower,int upper) {
-        occludedChunks=Set.copyOf(b.occludedChunks);assets=b.assets;entities=List.copyOf(b.entities);
+        occludedChunks=Set.copyOf(b.occludedChunks);assets=b.assets;entities=List.copyOf(b.entities);actorTextures=Map.copyOf(b.actorTextures);actorCount=b.actorCount;actorResources=b.actorResources;
         worldMinHeight=b.minHeight;worldMaxHeight=b.maxHeight;minHeight=lower;maxHeight=upper;
         sections=Set.copyOf(b.sections);neighbors=Map.copyOf(b.neighbors);instances=List.copyOf(b.instances);this.grid=Map.copyOf(grid);
         Set<BakedModel> meshes=Collections.newSetFromMap(new IdentityHashMap<>());
@@ -58,13 +63,67 @@ public final class SceneSnapshot {
     }
     public long indexBytes(){return grid.values().stream().mapToLong(s->128L+4L*(s.head.length+s.next.length+s.ids.length)).sum();}
     public int indexSections(){return grid.size();}
+    public record SpatialIndexLayout(int sections,int nodes,int knownSections,int occludedChunks) {}
+    public int worldMinHeight(){return worldMinHeight;}
+    public int worldMaxHeight(){return worldMaxHeight;}
+    private static int used(IndexSection section){int count=0;for(int head:section.head)count=Math.max(count,head+1);return count;}
+    public SpatialIndexLayout spatialIndexLayout() {
+        long nodes=0;for(var section:grid.values())nodes=Math.addExact(nodes,used(section));
+        return new SpatialIndexLayout(grid.size(),Math.toIntExact(nodes),sections.size(),occludedChunks.size());
+    }
+    private static final Comparator<Cell> CELL_ORDER=Comparator.comparingInt(Cell::x).thenComparingInt(Cell::y).thenComparingInt(Cell::z);
+    /** Copies compact links into caller-owned storage; the CPU index is never exposed or changed.
+     * Section rows: x,y,z,head offset,node offset,node count. Node rows: next-global,id.
+     * Known/occluded rows: x,y,z. All section tables are lexicographically sorted. */
+    public void copySpatialIndex(IntBuffer sectionRows,IntBuffer heads,IntBuffer nodes,IntBuffer known,IntBuffer occluded) {
+        var export=spatialIndexExport(sectionRows,heads,nodes,known,occluded);while(!export.step(16384,Long.MAX_VALUE,System::nanoTime)){}
+    }
+    public SpatialIndexExport spatialIndexExport(IntBuffer sectionRows,IntBuffer heads,IntBuffer nodes,IntBuffer known,IntBuffer occluded) {
+        return new SpatialIndexExport(sectionRows,heads,nodes,known,occluded);
+    }
+    public final class SpatialIndexExport {
+        private final IntBuffer rows,heads,nodes,known,hidden;
+        private final List<Cell> keys,available,occluded;
+        private int section,head,node,base,count,knownIndex,hiddenIndex;
+        private boolean opened;
+        private SpatialIndexExport(IntBuffer sectionRows,IntBuffer heads,IntBuffer nodes,IntBuffer known,IntBuffer occluded) {
+        var layout=spatialIndexLayout();
+        if(sectionRows.remaining()<layout.sections*6L || heads.remaining()<layout.sections*4096L || nodes.remaining()<layout.nodes*2L
+                || known.remaining()<layout.knownSections*3L || occluded.remaining()<layout.occludedChunks*3L)
+            throw new IllegalArgumentException("Insufficient spatial index export storage");
+            rows=sectionRows;this.heads=heads;this.nodes=nodes;this.known=known;hidden=occluded;
+            keys=new ArrayList<>(grid.keySet());keys.sort(CELL_ORDER);
+            available=new ArrayList<>(sections);available.sort(CELL_ORDER);
+            this.occluded=new ArrayList<>(occludedChunks);this.occluded.sort(CELL_ORDER);
+        }
+        public boolean step(int operations,long deadline,java.util.function.LongSupplier clock) {
+            if(operations<=0)throw new IllegalArgumentException("Positive export quantum required");
+            for(int op=0;op<operations && clock.getAsLong()<deadline;op++) {
+                if(section<keys.size()) {
+                    Cell key=keys.get(section);IndexSection data=grid.get(key);
+                    if(!opened){count=used(data);rows.put(key.x).put(key.y).put(key.z).put(heads.position()).put(base).put(count);opened=true;}
+                    if(head<4096){int end=Math.min(4096,head+128);while(head<end){int value=data.head[head++];heads.put(value<0?-1:base+value);}}
+                    else if(node<count){int end=Math.min(count,node+128);while(node<end){nodes.put(data.next[node]<0?-1:base+data.next[node]).put(data.ids[node]);node++;}}
+                    else{base=Math.addExact(base,count);section++;head=0;node=0;opened=false;}
+                }else if(knownIndex<available.size()){Cell c=available.get(knownIndex++);known.put(c.x).put(c.y).put(c.z);}
+                else if(hiddenIndex<occluded.size()){Cell c=occluded.get(hiddenIndex++);hidden.put(c.x).put(c.y).put(c.z);}
+                else return true;
+            }
+            return section==keys.size() && knownIndex==available.size() && hiddenIndex==occluded.size();
+        }
+    }
+
+    public Texture texture(ResourceKey key){Texture image=actorTextures.get(key);return image==null?assets.texture(key):image;}
+    public int actorCount(){return actorCount;}
+    public long actorSkinTextures(){return actorTextures.keySet().stream().filter(key->key.namespace().equals("famara") && key.path().startsWith("skin/")).count();}
+    @Override public void close(){if(actorResources!=null && actorsReleased.compareAndSet(false,true))try{actorResources.close();}catch(RuntimeException error){throw error;}catch(Exception error){throw new IllegalStateException("Actor resources failed to close",error);}}
 
     public AssetGeneration assets() {
         return assets;
     }
 
     public long estimatedBytes() {
-        return 128L*neighbors.size()+meshBytes+64L*sections.size()+512L*instances.size()
+        return actorTextures.values().stream().mapToLong(Texture::retainedBytes).sum()+128L*neighbors.size()+meshBytes+64L*sections.size()+512L*instances.size()
                 +grid.values().stream().mapToLong(s->128L+4L*(s.head.length+s.next.length+s.ids.length)).sum();
     }
     /** 每条渲染线程私有的primitive索引游标，不为每格创建Cell/List。 */
@@ -132,7 +191,18 @@ public final class SceneSnapshot {
         private final Set<Cell> sections = new HashSet<>();
         private final List<Instance> instances = new ArrayList<>();
         private final List<LegacyEntity> entities=new ArrayList<>();
-        private int entityBoxes;
+        private int entityBoxes,actorCount;
+        private final Map<ResourceKey,Texture> actorTextures=new HashMap<>();
+        private AutoCloseable actorResources;
+        public Builder actorResources(AutoCloseable resources){checkOpen();if(actorResources!=null)throw new IllegalStateException("Actor resources already assigned");actorResources=Objects.requireNonNull(resources);return this;}
+        public Builder actor(ActorGeometry actor){return actor(actor,0);}
+        public Builder actor(ActorGeometry actor,int skyDarken) {
+            if(skyDarken<0 || skyDarken>15)throw new IllegalArgumentException("Actor sky darkening outside 0..15");
+            checkOpen();if(instances.size()>=maxInstances)throw limit("Actor instances",instances.size()+1L,maxInstances);charge(2048);
+            for(var entry:actor.textures().entrySet()){Texture previous=actorTextures.putIfAbsent(entry.getKey(),entry.getValue());if(previous!=null && previous!=entry.getValue())throw new IllegalArgumentException("Actor texture identity conflict");}
+            var descriptor=VisualBlockDescriptor.vanilla(CanonicalBlockState.parse("famara:living_actor"),assets.id());
+            var a=actor.actor();instances.add(new Instance(instances.size(),actor.x(),actor.y(),actor.z(),descriptor,List.of(actor.model()),new Lighting(Math.max(0,a.sky()-skyDarken),a.block(),0xffffff)));actorCount++;return this;
+        }
         private final Set<Cell> occupied = new HashSet<>();
         private final Map<Cell,FluidMesher.Cell> neighbors=new HashMap<>();
         private boolean sealed;
