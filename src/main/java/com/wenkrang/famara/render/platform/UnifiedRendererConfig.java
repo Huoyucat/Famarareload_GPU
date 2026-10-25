@@ -29,7 +29,7 @@ public final class UnifiedRendererConfig {
         Map<String,Object> bundled=yaml(defaults),existing=original==null?new LinkedHashMap<>():yaml(new String(original,StandardCharsets.UTF_8));
         Map<String,Object> merged=copy(existing);List<String> changes=new ArrayList<>();
         int schema=existing.containsKey("render-v2-schema")?integer(existing.get("render-v2-schema"),"render-v2-schema"):0;
-        if(schema<0 || schema>11)throw new IllegalArgumentException("不支持的render-v2-schema");
+        if(schema<0 || schema>12)throw new IllegalArgumentException("不支持的render-v2-schema");
         boolean migrated=schema>0;
         Map<String,Object> imported=new LinkedHashMap<>();
         if(!migrated && original!=null) {
@@ -104,13 +104,14 @@ public final class UnifiedRendererConfig {
             upgrade(v2,"visuals","maximumStates",50000,100000,changes);
             upgrade(v2,"visuals","maximumFrozenBytes",67108864L,134217728L,changes);
         }
+        if(schema<12 && original!=null)upgrade(v2,"assets","maxTotalBytes",134217728L,201326592L,changes);
         Map<String,Object> oldShot=v2.containsKey("shot")?object(v2.get("shot"),"render-v2.shot"):new LinkedHashMap<>();
         Object oldDistance=oldShot.remove("distance");if(v2.containsKey("shot"))v2.put("shot",oldShot);
         Object distance=existing.containsKey("render-distance")?existing.get("render-distance"):oldDistance!=null?oldDistance:bundled.get("render-distance");
         int range=integer(distance,"render-distance");if(range<16 || range>256)throw new IllegalArgumentException("render-distance必须为16–256格");
         if(oldDistance!=null && integer(oldDistance,"旧shot.distance")!=range)changes.add("距离统一使用config.yml的render-distance="+range+"，移除旧shot.distance重复来源");
         v2=defaults(v2,object(bundled.get("render-v2"),"内置render-v2"));
-        merged=defaults(merged,bundled);merged.put("render-v2",v2);merged.put("render-distance",range);merged.put("render-v2-schema",11);merged.remove("textured-config");
+        merged=defaults(merged,bundled);merged.put("render-v2",v2);merged.put("render-distance",range);merged.put("render-v2-schema",12);merged.remove("textured-config");
         Object selection=merged.get("renderer-mode");if(!(selection instanceof String))throw new IllegalArgumentException("renderer-mode必须为TEXTURED或LEGACY字符串");
         PhotoRuntime.Mode mode;
         try{mode=PhotoRuntime.Mode.valueOf(((String)selection).toUpperCase(Locale.ROOT));}catch(IllegalArgumentException error){throw new IllegalArgumentException("renderer-mode只允许TEXTURED/LEGACY",error);}

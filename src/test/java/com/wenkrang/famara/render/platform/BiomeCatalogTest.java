@@ -31,6 +31,7 @@ class BiomeCatalogTest {
         var climate=new BiomeColors.Climate(.5,.5,0x123456,0,0x123123,null);
         assertEquals(0,BiomeColors.grass(assets,climate));
         assertEquals(0x123123,BiomeColors.tint(assets,CanonicalBlockState.parse("minecraft:oak_leaves"),climate,0));
+        assertEquals(0xffffff,BiomeColors.tint(assets,CanonicalBlockState.parse("minecraft:cherry_leaves"),climate,0x00ff00),"cherry leaves carry their pink color in the texture, not the foliage colormap");
         assertEquals(0xffffff,BiomeColors.tint(assets,CanonicalBlockState.parse("example:unknown"),climate,0));
         assertEquals(0x619961,BiomeColors.tint(assets,CanonicalBlockState.parse("minecraft:spruce_leaves"),climate,0));
         assertEquals(0xff3200,BiomeColors.redstone(15));assertEquals(0x4c0000,BiomeColors.redstone(0));

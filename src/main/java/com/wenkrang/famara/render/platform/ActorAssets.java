@@ -9,9 +9,11 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import java.io.*;
 import java.net.*;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.*;
 import java.util.*;
+import java.util.zip.ZipEntry;
 import java.util.concurrent.*;
 import java.util.zip.ZipFile;
 
@@ -42,7 +44,9 @@ public final class ActorAssets implements AutoCloseable {
     }
     private synchronized void releaseBatch(){if(--batches<0)throw new IllegalStateException("Actor batch owner underflow");releaseCatalog();}
     private void releaseCatalog(){if(closed && batches==0 && catalogMemory!=null){catalogMemory.close();catalogMemory=null;catalog=null;}}
-    public Batch batch(){synchronized(this){if(closed)throw new IllegalStateException("Actor resources closed");var lease=memory.reserve("actor-scene",512L*1024);batches++;return new Batch(lease);}}
+    public Batch batch(){return batch(List.of());}
+    /** CE sources are read lazily by exact path; the full pack is never copied into actor memory. */
+    public Batch batch(List<Path> customSources){synchronized(this){if(closed)throw new IllegalStateException("Actor resources closed");var lease=memory.reserve("actor-scene",512L*1024);batches++;return new Batch(lease,customSources);}}
     /** Restrict server-supplied profile URLs; never follow redirects to another host. */
     static URI skinUri(String source){
         try{URI u=URI.create(source);if(!Set.of("http","https").contains(u.getScheme()) || !"textures.minecraft.net".equalsIgnoreCase(u.getHost()) || u.getPort()!=-1 || u.getRawUserInfo()!=null || u.getRawQuery()!=null || u.getRawFragment()!=null || !u.getPath().matches("/texture/[0-9a-fA-F]{32,64}"))return null;return new URI("https",null,"textures.minecraft.net",-1,u.getPath(),null,null);}catch(Exception e){return null;}
@@ -69,10 +73,12 @@ public final class ActorAssets implements AutoCloseable {
         private boolean stopped,baking;
         private long incoming;
         private ZipFile source;
+        private final List<Path> customSources;
+        private final Map<Path,ZipFile> customZips=new HashMap<>();
         private ItemModelRenderer items;
         @Override public ItemModelRenderer items(){if(items==null)items=new ItemModelRenderer(this);return items;}
         @Override public Texture cached(ResourceKey key){return decoded.get(key);}
-        private Batch(RenderMemoryBudget.Lease lease){this.lease=lease;}
+        private Batch(RenderMemoryBudget.Lease lease,List<Path> customSources){this.lease=lease;this.customSources=List.copyOf(customSources);}
         public CompletionStage<List<ActorGeometry>> bake(List<FrozenActor> actors){
             return bake(actors,null);
         }
@@ -105,13 +111,37 @@ public final class ActorAssets implements AutoCloseable {
             return VanillaActorRenderer.bake(a,null,null,this);
         }
         @Override public ActorModelCatalog catalog(){return catalog;}
-        @Override public boolean has(String path){ResourcePack.validatePath(path);return source!=null && source.getEntry(path)!=null;}
-        @Override public byte[] read(String path){ResourcePack.validatePath(path);if(source==null)throw new IllegalStateException("Actor source read outside worker slice");var entry=source.getEntry(path);if(entry==null)return null;if(entry.getSize()>MAX_PNG)throw new IllegalStateException("Actor resource too large: "+path);try(InputStream in=source.getInputStream(entry)){byte[] bytes=in.readNBytes(MAX_PNG+1);if(bytes.length>MAX_PNG)throw new IOException("Actor resource exceeds entry limit");return bytes;}catch(IOException error){throw new CompletionException(error);}}
+        @Override public boolean has(String path){ResourcePack.validatePath(path);if(source==null)throw new IllegalStateException("Actor source read outside worker slice");for(Path root:customSources)if(customEntry(root,path)!=null)return true;return source.getEntry(path)!=null;}
+        @Override public byte[] read(String path){ResourcePack.validatePath(path);if(source==null)throw new IllegalStateException("Actor source read outside worker slice");for(Path root:customSources){byte[] bytes=customRead(root,path);if(bytes!=null)return bytes;}return readZip(source,path);}
+        private byte[] customRead(Path root,String path){
+            try {
+                Path normalized=root.toAbsolutePath().normalize();
+                if(Files.isDirectory(normalized)) {
+                    Path file=normalized.resolve(path).normalize();if(!file.startsWith(normalized) || !Files.isRegularFile(file))return null;
+                    if(!file.toRealPath().startsWith(normalized.toRealPath()))throw new IOException("Actor resource escaped CE source root");
+                    try(InputStream in=Files.newInputStream(file)){return bounded(in,path);}
+                }
+                ZipFile zip=customZip(normalized);return zip==null?null:readZip(zip,path);
+            } catch(IOException error){throw new CompletionException(error);}
+        }
+        private ZipFile customZip(Path path)throws IOException {
+            if(!Files.isRegularFile(path))return null;ZipFile cached=customZips.get(path);if(cached!=null)return cached;
+            ZipFile opened=new ZipFile(path.toFile());customZips.put(path,opened);return opened;
+        }
+        private ZipEntry customEntry(Path root,String path){
+            try {
+                Path normalized=root.toAbsolutePath().normalize();
+                if(Files.isDirectory(normalized)){Path file=normalized.resolve(path).normalize();return file.startsWith(normalized) && Files.isRegularFile(file)?new ZipEntry(path):null;}
+                ZipFile zip=customZip(normalized);return zip==null?null:zip.getEntry(path);
+            } catch(IOException error){throw new CompletionException(error);}
+        }
+        private byte[] readZip(ZipFile zip,String path){var entry=zip.getEntry(path);if(entry==null)return null;if(entry.getSize()>MAX_PNG)throw new IllegalStateException("Actor resource too large: "+path);try(InputStream in=zip.getInputStream(entry)){return bounded(in,path);}catch(IOException error){throw new CompletionException(error);}}
+        private byte[] bounded(InputStream in,String path)throws IOException{byte[] bytes=in.readNBytes(MAX_PNG+1);if(bytes.length>MAX_PNG)throw new IOException("Actor resource exceeds entry limit: "+path);return bytes;}
         @Override public Texture texture(ResourceKey key){return baseTexture(key);}
         @Override public Texture generated(ResourceKey key,byte[] png){return decode(key,png);}
         private Texture baseTexture(ResourceKey key){if(decoded.containsKey(key))return decoded.get(key);byte[] png=read(key.file("textures",".png"));if(png==null)throw new IllegalStateException("Missing actor texture "+key);return decode(key,png);}
         private Texture decode(ResourceKey key,byte[] png){Texture existing=decoded.get(key);if(existing!=null)return existing;var files=new HashMap<String,byte[]>();String path=key.file("textures",".png");files.put(path,png);if(source!=null){byte[] meta=read(path+".mcmeta");if(meta!=null)files.put(path+".mcmeta",meta);}Texture texture=Texture.decode(ResourcePack.memory("actor",files,LIMITS),key,LIMITS);retained+=texture.retainedBytes();checkSize();decoded.put(key,texture);return texture;}
-        private void release(){decoded.clear();lease.close();releaseBatch();}
+        private void release(){decoded.clear();for(ZipFile zip:customZips.values())try{zip.close();}catch(IOException ignored){}customZips.clear();lease.close();releaseBatch();}
         @Override public synchronized void close(){if(stopped)return;stopped=true;if(!baking)release();}
     }
     /** Validate dimensions before allocating, force the vanilla opaque skin regions, retain overlay alpha. */

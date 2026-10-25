@@ -1,0 +1,123 @@
+{
+  "memory": {
+    "maximumBytes": 536870912,
+    "occlusion": true
+  },
+  "baseResources": "resources/base-client.jar",
+  "resourceVersion": "26.3",
+  "assets": {
+    "maxEntries": 200000,
+    "maxEntryBytes": 4194304,
+    "maxTotalBytes": 134217728,
+    "maxTexturePixels": 1048576,
+    "maxAnimationFrames": 4096,
+    "maxModelFaces": 20000,
+    "maxReferenceDepth": 64,
+    "maxJsonDepth": 64,
+    "maxJsonNodes": 200000,
+    "maxModelSpan": 64
+  },
+  "cache": {
+    "generations": 2,
+    "retainedBytes": 268435456
+  },
+  "assetBuild": {
+    "maximumSourceBytes": 1073741824,
+    "operationsPerStep": 128,
+    "dispatchNanos": 5000000,
+    "quantumCpuNanos": 1000000,
+    "maxStepNanos": 8000000,
+    "timeoutNanos": 120000000000
+  },
+  "pipeline": {
+    "workers": 1,
+    "maxJobs": 2,
+    "perPlayer": 1,
+    "sceneMemoryBytes": 536870912,
+    "dispatchIntervalNanos": 5000000,
+    "quantumCpuNanos": 1000000,
+    "maxBatchCpuNanos": 8000000,
+    "scanBatchCpuNanos": 10000000,
+    "cpuMillisPerSecond": 200,
+    "burstMillis": 25,
+    "batchPixels": 1024,
+    "timeoutNanos": 120000000000
+  },
+  "visuals": {
+    "maximumStates": 100000,
+    "maximumFrozenBytes": 134217728,
+    "entriesPerTick": 64,
+    "nanosPerTick": 1000000,
+    "quantumCpuNanos": 1000000
+  },
+  "biomes": {
+    "maximum": 4096,
+    "entriesPerTick": 4,
+    "nanosPerTick": 1000000,
+    "quantumCpuNanos": 1000000
+  },
+  "capture": {
+    "windowChunks": 2,
+    "maxRequests": 2,
+    "maxChunksPerRequest": 128,
+    "maxInflight": 1,
+    "startsPerTick": 1,
+    "bytesPerChunk": 2097152,
+    "maximumSnapshotBytes": 268435456,
+    "nanosPerTick": 1000000,
+    "quantumCpuNanos": 1000000,
+    "timeoutNanos": 60000000000
+  },
+  "preparation": {
+    "maximumScannedCells": 500000,
+    "maximumStates": 2048,
+    "maximumInstances": 4000,
+    "maximumIndexEntries": 65536
+  },
+  "entities": {
+    "entitiesPerChunk": 512,
+    "maximumBoxes": 256
+  },
+  "ledger": {
+    "maxCameras": 10000,
+    "maxJobs": 10000,
+    "maxFileBytes": 67108864
+  },
+  "io": {
+    "maximum": 32,
+    "intervalNanos": 5000000,
+    "quantumNanos": 1000000
+  },
+  "maps": {
+    "maximumCanvases": 256,
+    "maximumRecoveryRequests": 16,
+    "maximumCachedFrames": 128
+  },
+  "lod": {
+    "enabled": false,
+    "minDistance": 64,
+    "maxProjectedPixels": 4
+  },
+  "shot": {
+    "samples": 1,
+    "filter": "MIPMAP",
+    "directionalLight": true,
+    "ambientFloor": 0.3,
+    "cutoutThreshold": 0.5,
+    "maxTransparentLayers": 32,
+    "backgroundRgb": 9418200,
+    "animationTicks": 0,
+    "traceLimits": {
+      "maxCells": 10000,
+      "maxIntersections": 1000,
+      "maxTests": 10000
+    },
+    "materialOverrides": {},
+    "distance": 16
+  },
+  "allowVanillaCe": [],
+  "loading": {
+    "cpuMillisPerSecond": 1000,
+    "burstMillis": 50
+  }
+}

@@ -18,7 +18,7 @@ listing=out/'ListLiving.java';listing.write_text('import org.bukkit.entity.*; pu
 api_cp=str(a.api.resolve())+':'+a.classpath_file.read_text().strip();types=subprocess.check_output(['java','-cp',api_cp,str(listing)],cwd=out,text=True).splitlines();assert len(types)==93
 bindings=dict(re.findall(r'Map.entry\("([A-Z_]+)","([a-z_/]+)"\)',(repo/'src/main/java/com/wenkrang/famara/render/scene/VanillaActorRegistry.java').read_text()));assert set(types)==set(bindings)
 doc=json.loads((out/'models-26.2.json').read_text());doc['livingTypes']=types;(out/'models-26.2.json').write_text(json.dumps(doc,separators=(',',':'))+'\n')
-archive=out/'vanilla-assets-26.2.zip';prefixes=['assets/minecraft/textures/','assets/minecraft/models/','assets/minecraft/items/','assets/minecraft/equipment/']
+archive=out/'vanilla-assets-26.2.zip';prefixes=['assets/minecraft/blockstates/','assets/minecraft/textures/','assets/minecraft/models/','assets/minecraft/items/','assets/minecraft/equipment/']
 with zipfile.ZipFile(client) as source,zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED,compresslevel=9) as target:
  for name in sorted(source.namelist()):
   if any(name.startswith(prefix) for prefix in prefixes) and not name.endswith('/'):

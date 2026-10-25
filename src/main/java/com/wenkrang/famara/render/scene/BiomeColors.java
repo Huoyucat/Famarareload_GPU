@@ -32,6 +32,9 @@ public final class BiomeColors {
         if(!state.block().namespace().equals("minecraft"))return 0xffffff;
         String name=state.block().path();
         if(name.equals("redstone_wire"))return redstone(Integer.parseInt(state.properties().getOrDefault("power","0")));
+        // Java 26.2 does not register cherry leaves in BlockColors: their pink
+        // shade is in the texture and they must not receive the green foliage LUT.
+        if(name.equals("cherry_leaves"))return 0xffffff;
         if(name.equals("spruce_leaves"))return 0x619961;
         if(name.equals("birch_leaves"))return 0x80a755;
         if(name.equals("mangrove_leaves"))return biome.foliage!=null?biome.foliage:0x92c648;

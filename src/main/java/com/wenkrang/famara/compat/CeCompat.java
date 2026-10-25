@@ -34,8 +34,9 @@ public final class CeCompat {
         List<VisualState> next(int maximum);
         boolean done();
     }
-    public record VisualSources(long epoch,boolean cePresent,boolean adapterAvailable,List<Path> paths) {
-        public VisualSources {paths=List.copyOf(paths);}
+    public record VisualSources(long epoch,boolean cePresent,boolean adapterAvailable,List<Path> paths,List<Path> actorAssetPaths) {
+        public VisualSources(long epoch,boolean cePresent,boolean adapterAvailable,List<Path> paths){this(epoch,cePresent,adapterAvailable,paths,paths);}
+        public VisualSources {paths=List.copyOf(paths);actorAssetPaths=List.copyOf(actorAssetPaths);}
     }
     private static final Object VISUAL_LOCK=new Object();
     private static final AtomicLong VISUAL_EPOCH=new AtomicLong(1);
@@ -44,7 +45,7 @@ public final class CeCompat {
     public static void invalidateVisualResources(){VISUAL_EPOCH.incrementAndGet();}
     public static VisualSources visualSources() {
         synchronized(VISUAL_LOCK) {
-            return new VisualSources(visualEpoch(),cePresent,backend.enabled(),CeColorService.persistentCandidates());
+            return new VisualSources(visualEpoch(),cePresent,backend.enabled(),CeColorService.persistentCandidates(),CeColorService.persistentActorCandidates());
         }
     }
     public static VisualCursor openVisualCursor(long expectedEpoch) {

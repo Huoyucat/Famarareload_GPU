@@ -131,7 +131,7 @@ public final class PhotoRuntime implements AutoCloseable {
                 if(closed)throw new CancellationException("基础源准备后插件已关闭");visuals.base(source.path(),source.manifest().zipSha256());actorAssets.base(source.path());
                 plugin.getLogger().info("V2内置基础资源已就绪："+source.manifest().clientVersion()+"，SHA256="+source.manifest().zipSha256()+"，无需外置客户端JAR");
             }
-            if(render){var actorSource=BundledActorResources.prepare(PhotoRuntime.class.getClassLoader(),com.wenkrang.famara.lib.DataFolders.of(plugin).toPath(),memory,()->!closed);actorAssets.base(actorSource.path());actorAssets.prepare();}
+            if(render){var actorSource=BundledActorResources.prepare(PhotoRuntime.class.getClassLoader(),com.wenkrang.famara.lib.DataFolders.of(plugin).toPath(),memory,()->!closed);actorAssets.base(actorSource.path());visuals.supplementalBase(actorSource.path(),actorSource.manifest().sha256());actorAssets.prepare();}
             return null;
         })).whenComplete((ignored,error)->{
             if(error!=null) {
@@ -220,6 +220,7 @@ public final class PhotoRuntime implements AutoCloseable {
         ItemMeta meta=held.getItemMeta();CameraIdentity.Account account=CameraIdentity.assign(meta);held.setItemMeta(meta);
         var input=visuals.acquire();WorldPreparation preparation=null;Run run=new Run(UUID.randomUUID());
         try {
+            var visualSources=CeCompat.visualSources();if(visualSources.epoch()!=input.table().epoch())throw new IllegalStateException("CE资源在照片受理期间更新");
             var eye=player.getEyeLocation();World world=player.getWorld();
             Camera camera=new Camera(new Vec3(eye.getX(),eye.getY(),eye.getZ()),Math.toRadians(eye.getYaw()+90),Math.toRadians(-eye.getPitch()),Camera.Projection.LEGACY_ANGULAR,1);
             var info=new WorldPreparation.WorldInfo(world.getUID(),world.getMinHeight(),world.getMaxHeight(),world.getSeed(),RuntimeCompat.hasSkyLight(world),RuntimeCompat.skyDarken(world));
@@ -231,7 +232,7 @@ public final class PhotoRuntime implements AutoCloseable {
                     config.allowVanillaCe().stream().map(ResourceKey::parse).collect(java.util.stream.Collectors.toUnmodifiableSet()),
                     biome.resolver(generation));
             preparation.memory(memory);preparation.window(config.capture().windowChunks());preparation.lod(config.lod());preparation.occlusion(config.memory().occlusion());preparation.guard(biome::current);
-            var actorBatch=actorAssets.batch();
+            var actorBatch=actorAssets.batch(visualSources.actorAssetPaths());
             try{preparation.extras(new LivingEntityCapture(plugin,new LegacyEntityCapture(input.table().epoch(),config.entities(),camera.origin(),config.shot().distance()),actorBatch,world.getUID(),player.getUniqueId(),camera,config.shot().distance()));}
             catch(RuntimeException | Error error){actorBatch.close();throw error;}
             ItemStack pendingCamera=ItemSystem.get("camera_filmed");CameraIdentity.copy(held,pendingCamera,false);

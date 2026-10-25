@@ -21,6 +21,7 @@ class CeAutomaticColorsTest {
     @BeforeEach void resetSources() {
         CeColorService.closeQueue();CeColorService.configure(List.of(), List.of(), path -> null);
         CeColorService.external(List.of(), List.of());
+        CeColorService.actorSupplemental(List.of());
         CeColorService.generated(null, null);
         CeColorService.models(Map.of());
         CeColorService.diagnostics(root.resolve("ce-color-index.txt"));
@@ -52,6 +53,13 @@ class CeAutomaticColorsTest {
     }
     private ColorManager.View palette(Map<String, Integer> colors) {
         return new ColorManager.View(colors, colors, Map.of(), List.of());
+    }
+
+    @Test void inactiveCePackResourcesAreLazyActorFallbacksButStayOutOfBlockSources() throws Exception {
+        Path generated=root.resolve("generated.zip"),enabled=Files.createDirectories(root.resolve("enabled/resourcepack")),inactive=Files.createDirectories(root.resolve("inactive/resourcepack"));
+        zip(generated,Map.of());CeColorService.configure(List.of(enabled),List.of(),path->null);CeColorService.generated(null,generated);CeColorService.actorSupplemental(List.of(inactive));
+        var blockSources=CeColorService.persistentCandidates();var actorSources=CeColorService.persistentActorCandidates();
+        assertFalse(blockSources.contains(inactive));assertEquals(blockSources,actorSources.subList(0,blockSources.size()));assertTrue(actorSources.indexOf(inactive)>actorSources.indexOf(enabled));
     }
 
     @Test void generatedBlockstateCanResolvePlantTextureInConfiguredSourceFolder() throws Exception {

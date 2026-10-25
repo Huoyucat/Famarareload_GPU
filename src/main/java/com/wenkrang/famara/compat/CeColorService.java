@@ -21,6 +21,7 @@ final class CeColorService {
     private static volatile List<Path> configured = List.of();
     private static volatile List<Path> external = List.of();
     private static volatile List<Path> defaults = List.of();
+    private static volatile List<Path> actorSupplemental = List.of();
     private static volatile Function<String, byte[]> presetModels = path -> null;
     private static long modelRevision;
     private static volatile Map<String, CeCompat.ItemModel> itemModels = Map.of();
@@ -68,6 +69,9 @@ final class CeColorService {
         defaults = normalized(fallbacks);
         presetModels = presets;
     }
+
+    /** Inactive CE packs stay available as lazy actor-asset fallbacks without entering block compilation. */
+    static synchronized void actorSupplemental(Collection<Path> roots) { actorSupplemental=normalized(roots); }
 
     static synchronized void external(Collection<Path> folders, Collection<Path> zips) {
         List<Path> paths = new ArrayList<>(folders);
@@ -117,6 +121,11 @@ final class CeColorService {
             result.add(path);
         }
         return List.copyOf(result);
+    }
+    static synchronized List<Path> persistentActorCandidates() {
+        List<Path> result=new ArrayList<>(candidates(List.of()));result.addAll(actorSupplemental);
+        List<Path> persistent=new ArrayList<>();for(Path path:normalized(result))if(path.getFileSystem()==java.nio.file.FileSystems.getDefault() && path.getFileSystem().isOpen())persistent.add(path);
+        return List.copyOf(persistent);
     }
     static synchronized void performance(com.wenkrang.famara.render.schedule.CpuBudget budget,com.wenkrang.famara.render.schedule.BudgetedAssetLoader.Limits limits) {
         if(queue==null)queue=new CeColorBuildQueue(budget,limits);else queue.configure(budget,limits);

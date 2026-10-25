@@ -4,7 +4,7 @@ renderer-mode: "TEXTURED"
 # 唯一拍摄距离（16–256格）；大距离仍受区块/扫描/实例和CPU限额保护。
 render-distance: 128
 viewfinder-zoom-strength: 0.5
-render-v2-schema: 11
+render-v2-schema: 12
 # 以下是正式运行默认，不是原离线样例。384MiB仅为快照域，非插件总堆上限。
 # 如果你不清楚这是什么，请不要修改参数。
 render-v2:
@@ -32,7 +32,7 @@ render-v2:
   assets:
     maxEntries: 200000
     maxEntryBytes: 4194304
-    maxTotalBytes: 134217728
+    maxTotalBytes: 201326592
     maxTexturePixels: 1048576
     maxAnimationFrames: 4096
     maxModelFaces: 20000

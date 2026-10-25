@@ -76,7 +76,7 @@ class UnifiedRendererConfigTest {
         Files.writeString(root.resolve("render-v2.json"),"bad legacy file must not be imported again");
         var upgraded=UnifiedRendererConfig.load(root,defaults());
         assertEquals(402653184,upgraded.renderer().capture().maximumSnapshotBytes());assertEquals(384,upgraded.renderer().capture().maxChunksPerRequest());
-        assertEquals(11,upgraded.yaml().getInt("render-v2-schema"));byte[] first=Files.readAllBytes(root.resolve("config.yml"));
+        assertEquals(12,upgraded.yaml().getInt("render-v2-schema"));byte[] first=Files.readAllBytes(root.resolve("config.yml"));
         var twice=UnifiedRendererConfig.load(root,defaults());assertTrue(twice.changes().isEmpty());assertArrayEquals(first,Files.readAllBytes(root.resolve("config.yml")));
     }
 
@@ -105,7 +105,7 @@ class UnifiedRendererConfigTest {
                 """.formatted(custom?777:200,custom?60:25,custom?3000000:5000000));
             var loaded=UnifiedRendererConfig.load(root,defaults());var pipeline=loaded.renderer().pipeline();
             assertEquals(custom?777:2000,pipeline.cpuMillisPerSecond());assertEquals(custom?60:100,pipeline.burstMillis());assertEquals(custom?3000000:1000000,pipeline.dispatchIntervalNanos());
-            assertEquals(120000000000L,pipeline.timeoutNanos());assertEquals(2,pipeline.workers());assertEquals(11,loaded.yaml().getInt("render-v2-schema"));
+            assertEquals(120000000000L,pipeline.timeoutNanos());assertEquals(2,pipeline.workers());assertEquals(12,loaded.yaml().getInt("render-v2-schema"));
             byte[] first=Files.readAllBytes(root.resolve("config.yml"));assertTrue(UnifiedRendererConfig.load(root,defaults()).changes().isEmpty());assertArrayEquals(first,Files.readAllBytes(root.resolve("config.yml")));
         }
     }
@@ -205,12 +205,26 @@ class UnifiedRendererConfigTest {
                     maximumFrozenBytes: %d
                 """.formatted(pair[0],pair[1]));
             var result=UnifiedRendererConfig.load(root,defaults());assertEquals(pair[0]==50000?100000:pair[0],result.renderer().visuals().maximumStates());assertEquals(pair[1]==67108864?134217728:pair[1],result.renderer().visuals().maximumFrozenBytes());
-            assertEquals(11,result.yaml().getInt("render-v2-schema"));assertEquals(48,result.renderer().shot().distance());assertEquals(536870912,result.renderer().memory().maximumBytes());
+            assertEquals(12,result.yaml().getInt("render-v2-schema"));assertEquals(48,result.renderer().shot().distance());assertEquals(536870912,result.renderer().memory().maximumBytes());
             byte[] after=Files.readAllBytes(original);assertTrue(UnifiedRendererConfig.load(root,defaults()).changes().isEmpty());assertArrayEquals(after,Files.readAllBytes(original));
         }
     }
     @Test void freshVisualLimitsAreCeilingsNotARequestForExtraGlobalMemory()throws Exception {
         var result=UnifiedRendererConfig.load(root,defaults());assertEquals(100000,result.renderer().visuals().maximumStates());assertEquals(134217728,result.renderer().visuals().maximumFrozenBytes());assertEquals(536870912,result.renderer().memory().maximumBytes());assertEquals(2,result.renderer().pipeline().workers());
+    }
+
+    @Test void schemaElevenRaisesOnlyTheKnownAssetTemplateLimitForFull262Coverage()throws Exception {
+        for(int value:new int[]{134217728,100663296}) {
+            config("""
+                    render-v2-schema: 11
+                    render-distance: 64
+                    render-v2:
+                      assets:
+                        maxTotalBytes: %d
+                    """.formatted(value));
+            var result=UnifiedRendererConfig.load(root,defaults());assertEquals(value==134217728?201326592:value,result.renderer().assets().maxTotalBytes());assertEquals(12,result.yaml().getInt("render-v2-schema"));
+            byte[] saved=Files.readAllBytes(root.resolve("config.yml"));assertTrue(UnifiedRendererConfig.load(root,defaults()).changes().isEmpty());assertArrayEquals(saved,Files.readAllBytes(root.resolve("config.yml")));
+        }
     }
 
 }

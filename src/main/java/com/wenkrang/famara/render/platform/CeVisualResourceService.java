@@ -48,7 +48,16 @@ public final class CeVisualResourceService implements AutoCloseable {
     private final Limits limits;
     private Path base;
     private String baseSha;
+    private List<BudgetedAssetLoader.Source> supplementalBase=List.of();
     public synchronized void base(Path path,String sha256){if(closed || timer!=null || building!=null)throw new IllegalStateException("视觉服务已启动或关闭");base=Objects.requireNonNull(path);baseSha=sha256;}
+    /** Lower-priority versioned vanilla models/texture fallbacks used when a CE pack inherits game parents absent from its selected base version. */
+    public synchronized void supplementalBase(Path path,String sha256){
+        if(closed || timer!=null || building!=null)throw new IllegalStateException("视觉服务已启动或关闭");
+        Objects.requireNonNull(path);if(sha256==null || !sha256.matches("[0-9a-f]{64}"))throw new IllegalArgumentException("补充基础资源缺少有效SHA256");
+        if(supplementalBase.size()>=4)throw new IllegalArgumentException("补充基础资源超过四个来源");
+        if(supplementalBase.stream().anyMatch(s->s.path().toAbsolutePath().normalize().equals(path.toAbsolutePath().normalize())))return;
+        var next=new ArrayList<>(supplementalBase);next.add(new BudgetedAssetLoader.Source(path,ResourcePack.Role.BASE,true,sha256));supplementalBase=List.copyOf(next);
+    }
     private final Consumer<Throwable> errors;
     private final ThreadMXBean meter=ManagementFactory.getThreadMXBean();
     private Sched.Task timer;
@@ -84,6 +93,7 @@ public final class CeVisualResourceService implements AutoCloseable {
                 List<BudgetedAssetLoader.Source> paths=new ArrayList<>();
                 for(Path path:sources.paths())paths.add(new BudgetedAssetLoader.Source(path,ResourcePack.Role.CUSTOM,false));
                 paths.add(new BudgetedAssetLoader.Source(base,ResourcePack.Role.BASE,true,baseSha));Build captured=job;
+                paths.addAll(supplementalBase);
                 loader.prepareSources(paths,()->current(captured)).whenComplete((staged,error)->{
                     synchronized(CeVisualResourceService.this) {
                         if(!current(captured)){if(staged!=null)staged.generation().releaseMemory();return;}

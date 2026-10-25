@@ -37,7 +37,9 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -125,9 +127,14 @@ public final class CraftEngineBackend implements CeCompat.Backend {
             if (pack.enabled()) roots.addAll(Arrays.asList(pack.resourcePackFolders()));
         }
         Collections.reverse(roots);
+        List<Path> actorFallbacks=new ArrayList<>();Path resourceRoots=Bukkit.getPluginsFolder().toPath().resolve("CraftEngine/resources");
+        if(Files.isDirectory(resourceRoots))try(var packs=Files.list(resourceRoots)) {
+            packs.sorted().map(path->path.resolve("resourcepack")).filter(Files::isDirectory).forEach(actorFallbacks::add);
+        }catch(IOException error){LOG.warning("枚举 CraftEngine 备用实体资源目录失败："+error);}
         Path generated = defaultPackZip().toPath().getParent();
         CeColorService.configure(roots, List.of(defaultPackZip().toPath(), generated.resolve("resourcepack"),
                 generated.resolve("resource_pack")), CraftEngineBackend::presetModel);
+        CeColorService.actorSupplemental(actorFallbacks);
         CeColorService.diagnostics(report);
     }
 

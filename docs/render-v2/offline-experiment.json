@@ -1,0 +1,180 @@
+{
+  "assets": {
+    "maxEntries": 200000,
+    "maxEntryBytes": 4194304,
+    "maxTotalBytes": 134217728,
+    "maxTexturePixels": 1048576,
+    "maxAnimationFrames": 4096,
+    "maxModelFaces": 20000,
+    "maxReferenceDepth": 64,
+    "maxJsonDepth": 64,
+    "maxJsonNodes": 200000,
+    "maxModelSpan": 64
+  },
+  "pipeline": {
+    "workers": 1,
+    "maxJobs": 2,
+    "perPlayer": 1,
+    "sceneMemoryBytes": 536870912,
+    "dispatchIntervalNanos": 5000000,
+    "quantumCpuNanos": 1000000,
+    "maxBatchCpuNanos": 8000000,
+    "scanBatchCpuNanos": 10000000,
+    "cpuMillisPerSecond": 200,
+    "burstMillis": 25,
+    "batchPixels": 1024,
+    "timeoutNanos": 120000000000
+  },
+  "assetBuild": {
+    "maximumSourceBytes": 1073741824,
+    "operationsPerStep": 128,
+    "dispatchNanos": 5000000,
+    "quantumCpuNanos": 1000000,
+    "maxStepNanos": 8000000,
+    "timeoutNanos": 120000000000
+  },
+  "scene": {
+    "minHeight": 0,
+    "maxHeight": 32,
+    "maxInstances": 4000,
+    "maxIndexEntries": 65536,
+    "sections": [
+      {
+        "x": -1,
+        "y": 0,
+        "z": -1
+      },
+      {
+        "x": -1,
+        "y": 1,
+        "z": -1
+      },
+      {
+        "x": -1,
+        "y": 0,
+        "z": 0
+      },
+      {
+        "x": -1,
+        "y": 1,
+        "z": 0
+      },
+      {
+        "x": -1,
+        "y": 0,
+        "z": 1
+      },
+      {
+        "x": -1,
+        "y": 1,
+        "z": 1
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "z": -1
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "z": -1
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "z": 0
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "z": 1
+      },
+      {
+        "x": 0,
+        "y": 1,
+        "z": 1
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "z": -1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "z": -1
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "z": 0
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "z": 0
+      },
+      {
+        "x": 1,
+        "y": 0,
+        "z": 1
+      },
+      {
+        "x": 1,
+        "y": 1,
+        "z": 1
+      }
+    ],
+    "blocks": [
+      {
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "logicalId": "minecraft:stone",
+        "visualState": "minecraft:stone",
+        "ce": false,
+        "sky": 15,
+        "block": 0,
+        "tintRgb": 16777215
+      }
+    ]
+  },
+  "shot": {
+    "camera": {
+      "origin": {
+        "x": 0.5,
+        "y": 0.5,
+        "z": -2
+      },
+      "yaw": 1.5707963267948966,
+      "pitch": 0,
+      "projection": "LEGACY_ANGULAR",
+      "horizontalFov": 1
+    },
+    "settings": {
+      "samples": 1,
+      "filter": "MIPMAP",
+      "directionalLight": true,
+      "ambientFloor": 0.3,
+      "cutoutThreshold": 0.5,
+      "maxTransparentLayers": 32,
+      "backgroundRgb": 9418200,
+      "animationTicks": 0,
+      "traceLimits": {
+        "maxCells": 10000,
+        "maxIntersections": 1000,
+        "maxTests": 10000
+      },
+      "materialOverrides": {},
+      "distance": 8
+    },
+    "reservationBytes": 201326592,
+    "outputId": 1
+  },
+  "cePacks": []
+}
